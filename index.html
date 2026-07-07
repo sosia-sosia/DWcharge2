@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver180</title>
+<title>DUNGEON WALKER DWCver189</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -70,6 +70,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #enemy-sprite img.scale-mid{width:auto;height:132px;}
 #enemy-sprite img.scale-large{width:auto;height:165px;}
 #enemy-sprite img.scale-boss{width:auto;height:198px;}
+#enemy-sprite img.scale-large-sm{width:auto;height:132px;}
+#enemy-sprite img.scale-boss-sm{width:auto;height:158px;}
+/* 炎の神殿モンスター縁取り */
+.temple-outline{filter:drop-shadow(0 0 3px rgba(0,0,0,1)) drop-shadow(0 0 2px rgba(0,0,0,1)) drop-shadow(1px 1px 0 #000) drop-shadow(-1px -1px 0 #000) drop-shadow(1px -1px 0 #000) drop-shadow(-1px 1px 0 #000);}
 #enemy-tags{display:none;}
 .tag{font-size:8px;padding:2px 6px;border-radius:8px;}
 .tag.shield{background:rgba(52,152,219,.2);color:#5dade2;border:1px solid rgba(52,152,219,.5);}
@@ -427,7 +431,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   background-position:center;
   z-index:0;
   pointer-events:none;
-  filter:var(--bg-filter, none);
 }
 #enemy-area.torch::before { animation:torch-flicker 5s ease-in-out infinite; }
 #enemy-area.wave::before  { animation:bg-noise-pulse 5s linear infinite; }
@@ -673,7 +676,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver180</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver189</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -810,8 +813,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div id="enemy-intent" style="cursor:pointer;touch-action:manipulation;" onclick="showEnemyIntentDetail && typeof currentEnemyAct!=='undefined' && showEnemyIntentDetail(currentEnemyAct, (STAGES[G.stageIndex]||{}).intentDetail||{}, (STAGES[G.stageIndex]||{}).actions||[])">---</div>
       <div id="enemy-name">---</div>
     </div>
+
     
     <div id="enemy-area">
+      <!-- エリア効果バッジ（ステージ背景左上に重ねて表示） -->
+      <div id="area-effect-box" style="display:none;position:absolute;top:6px;left:6px;z-index:12;background:rgba(180,60,0,.85);border:1px solid #e07030;border-radius:5px;padding:2px 8px;cursor:pointer;touch-action:manipulation;" onclick="showAreaEffectDetail()" ontouchend="event.preventDefault();showAreaEffectDetail();">
+        <span id="area-effect-badge-text" style="font-size:8px;color:#ffaa44;font-weight:bold;font-family:sans-serif;"></span><span class="blink-arrow" style="font-size:7px;color:#e74c3c;margin-left:3px;">▼</span>
+      </div>
       <!-- 中段逆向きモヤ：背景::before上(z1)・enemy-sprite下(z3) -->
       <div id="mid-mist-layer" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;">
         <div class="mid-mist-strip mid-mist-1"></div>
@@ -922,6 +930,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <div>ステージ数: <span id="acp-stages" style="color:#fff;font-weight:bold;"></span></div>
       </div>
       <div id="acp-desc" style="font-size:12px;color:#ccc;text-align:center;line-height:1.6;"></div>
+      <div id="acp-effect-wrap" style="display:none;width:100%;background:rgba(224,112,48,.1);border:1px solid rgba(224,112,48,.5);border-radius:8px;padding:8px 12px;">
+        <div style="font-size:9px;color:#e07030;font-family:'Cinzel',serif;letter-spacing:1px;margin-bottom:4px;">⚠️ エリア効果</div>
+        <div id="acp-effect-name" style="font-size:11px;color:#ffaa44;font-weight:bold;font-family:sans-serif;margin-bottom:2px;"></div>
+        <div id="acp-effect-desc" style="font-size:10px;color:#ccc;font-family:sans-serif;line-height:1.5;"></div>
+      </div>
       <div style="display:flex;gap:12px;width:100%;margin-top:4px;">
         <button id="acp-ok" style="flex:1;background:#1a4020;border:2px solid #4a8;border-radius:6px;padding:10px;color:#4e4;font-size:13px;font-weight:bold;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">決定</button>
         <button id="acp-cancel" style="flex:1;background:#2a1010;border:2px solid #a44;border-radius:6px;padding:10px;color:#e44;font-size:13px;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">キャンセル</button>
@@ -1279,11 +1292,7 @@ function getBgImg(stage){
     return stage>=4?'hajimari2.png':'hajimari1.png';
   }
   if(G.areaId===2){
-    // bg1.pngを赤寄りフィルターで使い回す
-    if(stage>=7) return 'bg4.png';
-    if(stage>=4) return 'bg3.png';
-    if(stage>=2) return 'bg2.png';
-    return 'bg1.png';
+    return stage>=9?'honoo2.png':'honoo1.png';
   }
   if(stage>=9) return 'bg4.png';
   if(stage>=6) return 'bg3.png';
@@ -1332,7 +1341,7 @@ const TEMPLE_ENEMIES=[
   {name:'ブレイズマンイーター',icon:'🌿',hp:180,atk:17, shield:15, pattern:['bigcurse','ignite','summon','big','atk'],                      boss:false, img:'cave_enemy4.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
   {name:'ブレイズゴーレム',  icon:'🗿',hp:220, atk:19, shield:20, pattern:['bigdef','quake','big','superbigdef','ignite'],                  boss:false, img:'enemy6.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
   {name:'ブレイズトロール',  icon:'🧌',hp:290, atk:22, shield:25, pattern:['ignite','bigcurse','big','superbigdef','bigheal'],              boss:false, img:'cave_enemy5.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズデーモン',  icon:'😈',hp:450, atk:28, shield:35, pattern:['enervate','big','ignite','reflect_e','bigheal'],               boss:true,  img:'enemy14.png',     filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズデーモンロード',icon:'😈',hp:450, atk:28, shield:35, pattern:['enervate','big','ignite','reflect_e','bigheal'],               boss:true,  img:'demonlord.png'},
 ];
 // カード挙動テスト用サンドバッグ（反撃なし・HP実質無限）
 const SANDBAG_ENEMY={name:'サンドバッグ（テスト用）',icon:'🛡️',hp:9999,atk:0,shield:0,pattern:['def'],boss:false,img:null};
@@ -1533,7 +1542,7 @@ function _startStageBattle(){
       const sizeClass= G.areaId===0
         ? (isFinalStage?'scale-mid':'scale-small')
         : G.areaId===2
-          ? (isFinalStage?'scale-boss':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
+          ? (isFinalStage?'scale-boss-sm':G.stage===8?'scale-large-sm':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
           : (G.stage===15?'scale-boss':G.stage>=14?'scale-large':G.stage>=9?'scale-mid':'scale-small');
       const imgEl=document.createElement('img');
       imgEl.src=eImg;
@@ -1808,6 +1817,23 @@ function playCard(idx, _isChain){
     G.totalCardsUsed=(G.totalCardsUsed||0)+1;
     G.turnCardsUsed=(G.turnCardsUsed||0)+1;
     G.turnCostSum=(G.turnCostSum||0)+actualCost;
+    // エリア効果：灼熱の代償（炎の神殿）使用マナ分のダメージ
+    const _areaEff=AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect;
+    if(_areaEff&&_areaEff.id==='manaburn'&&actualCost>0&&G.invincibleTurns<=0){
+      const _mbDmg=actualCost*2;
+      G.playerHp=Math.max(0,G.playerHp-_mbDmg);
+      addLog('🔥 灼熱の代償: HP-'+_mbDmg,'sys');
+      queueEffect(()=>{
+        spawnDmgNum('-'+_mbDmg,'player-dmg');
+        shakePlayerArea();
+        flashScreen('flash-red');
+        updateUI();
+      },400);
+      if(G.playerHp<=0){
+        queueEffect(()=>{ defeat('灼熱の代償'); },800);
+        return;
+      }
+    }
     if(c.type==='attack'){
       G.turnAtkCardCount=(G.turnAtkCardCount||0)+1;
       if(G.comboHealActive){const chHeal=healPlayer((G.comboHealVal||3)+(G.healBuff||0));if(chHeal>0){queueEffect(()=>{sfxHeal();spawnDmgNum('+'+chHeal,'heal');flashHealEffect(chHeal);}, 800);}}
@@ -3419,8 +3445,8 @@ function victory(){
   addLog('✨ '+G.enemy.name+'を倒した！','sys');
   G.totalDmgDealt=(G.totalDmgDealt||0);
 
-  // ステージ9（index8=SHADOW LORD）撃破後の異世界演出
-  if(G.stage===8){
+  // ステージ9（index8=SHADOW LORD）撃破後の異世界演出（炎の神殿ではスキップ）
+  if(G.stage===8 && G.areaId!==2){
     // ボスのスプライトをフェードアウト（2秒停止）
     const sp=document.getElementById('enemy-sprite');
     if(sp){sp.style.transition='opacity 0.8s';sp.style.opacity='0';}
@@ -4163,6 +4189,7 @@ const AREA_DATA = [
     stages: 5,
     difficulty: '★',
     desc: '初心者向けの入門ダンジョン',
+    areaEffect: null,
   },
   {
     name: '忘却の遺跡',
@@ -4170,6 +4197,7 @@ const AREA_DATA = [
     stages: 15,
     difficulty: '★★★',
     desc: 'スタンダード難易度のダンジョン',
+    areaEffect: null,
   },
   {
     name: '炎の神殿',
@@ -4177,6 +4205,13 @@ const AREA_DATA = [
     stages: 10,
     difficulty: '★★★★',
     desc: '灼熱の炎に満ちた神殿。炎系の強敵が待ち受ける',
+    areaEffect: {
+      id: 'manaburn',
+      name: '灼熱の代償',
+      icon: '🔥',
+      shortDesc: 'カード使用ごとに使用マナ×2のダメージ',
+      fullDesc: 'カードを使用するたびに、そのカードの使用マナ×2のダメージを受ける。マナ0のカードはダメージなし。',
+    },
   },
 ];
 
@@ -4200,6 +4235,15 @@ function showAreaConfirm(idx){
   document.getElementById('acp-difficulty').textContent=a.difficulty;
   document.getElementById('acp-stages').textContent=a.stages+'ステージ';
   document.getElementById('acp-desc').textContent=a.desc;
+  // エリア効果表示
+  const effWrap=document.getElementById('acp-effect-wrap');
+  if(a.areaEffect){
+    document.getElementById('acp-effect-name').textContent=a.areaEffect.icon+' '+a.areaEffect.name;
+    document.getElementById('acp-effect-desc').textContent=a.areaEffect.fullDesc;
+    effWrap.style.display='block';
+  } else {
+    effWrap.style.display='none';
+  }
   const pop=document.getElementById('ov-area-confirm');
   pop.style.display='flex';
   const okBtn=document.getElementById('acp-ok');
@@ -4828,6 +4872,17 @@ function updateUI(){
     document.getElementById('enemy-hp-bar').style.width=Math.max(0,e.curHp/e.hp*100)+'%';
     document.getElementById('enemy-hp-num').textContent=e.curHp+'/'+e.hp;
   }
+  // エリア効果バッジ表示
+  const _aef=AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect;
+  const _aefBox=document.getElementById('area-effect-box');
+  if(_aefBox){
+    if(_aef){
+      document.getElementById('area-effect-badge-text').textContent=_aef.icon+' '+_aef.name;
+      _aefBox.style.display='block';
+    } else {
+      _aefBox.style.display='none';
+    }
+  }
   // 背景画像切り替え（変化があった時だけ更新）
   const _eaBg=document.getElementById('enemy-area');
   if(_eaBg){
@@ -4836,16 +4891,15 @@ function updateUI(){
       _eaBg.style.setProperty('--bg-url',_bgUrl);
       _eaBg._lastBgUrl=_bgUrl;
     }
-    // 炎の神殿は背景を赤寄りにフィルターで色変え（::before擬似要素のみに適用）
-    const _bgFilter=G.areaId===2?'hue-rotate(330deg) saturate(1.8) brightness(0.85)':'none';
-    if(_eaBg._lastBgFilter!==_bgFilter){
-      _eaBg.style.setProperty('--bg-filter',_bgFilter);
-      _eaBg._lastBgFilter=_bgFilter;
-    }
-    const _wantClass=G.stage<(G.areaId===2?5:9)?'torch':'wave';
-    if(!_eaBg.classList.contains(_wantClass)){
+    // 炎の神殿は明滅なし・他エリアのみtorch/wave適用
+    if(G.areaId!==2){
+      const _wantClass=G.stage<9?'torch':'wave';
+      if(!_eaBg.classList.contains(_wantClass)){
+        _eaBg.classList.remove('torch','wave');
+        _eaBg.classList.add(_wantClass);
+      }
+    } else {
       _eaBg.classList.remove('torch','wave');
-      _eaBg.classList.add(_wantClass);
     }
   }
   const eAreaEl=document.getElementById('enemy-area');
@@ -4862,16 +4916,25 @@ function updateUI(){
     const sizeClass=G.areaId===0
       ?(_isFinal2?'scale-mid':'scale-small')
       :G.areaId===2
-        ?(_isFinal2?'scale-boss':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
+        ?(_isFinal2?'scale-boss-sm':G.stage===8?'scale-large-sm':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
         :(G.stage===15?'scale-boss':G.stage>=14?'scale-large':G.stage>=9?'scale-mid':'scale-small');
-    const _cacheKey=imgSrc+'||'+((e&&e.filter)||'');
+    const _cacheKey=imgSrc+'||'+((e&&e.filter)||'')+'||'+sizeClass;
     if(!spriteEl._currentSrc||spriteEl._currentSrc!==_cacheKey){
       spriteEl.innerHTML='';
       spriteEl.style.backgroundImage='none';
       const img=document.createElement('img');
       img.src=imgSrc;
       img.className='enemy-img '+sizeClass;
-      img.style.filter=(e&&e.filter)||'';
+      // 炎の神殿：フィルター＋縁取りを合成
+      if(G.areaId===2){
+        const _baseFilter=(e&&e.filter)||'';
+        const _outline='drop-shadow(0 0 3px rgba(0,0,0,1)) drop-shadow(1px 1px 0 #000) drop-shadow(-1px -1px 0 #000) drop-shadow(1px -1px 0 #000) drop-shadow(-1px 1px 0 #000)';
+        // ステージ10（isFinalStage）は縁取りなし
+        const _isFinalForOutline=G.stage===getAreaEnemies().length-1;
+        img.style.filter=_baseFilter?_baseFilter+(_isFinalForOutline?'':' '+_outline):(_isFinalForOutline?'':_outline);
+      } else {
+        img.style.filter=(e&&e.filter)||'';
+      }
       img.onerror=()=>{spriteEl.textContent=e.icon;};
       spriteEl.appendChild(img);
       spriteEl._currentSrc=_cacheKey;
@@ -5212,6 +5275,29 @@ function stopCurseOrbs(){
 }
 
 
+function showAreaEffectDetail(){
+  const aef=AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect;
+  if(!aef) return;
+  // 既存のポップアップがあれば除去
+  const _old=document.getElementById('area-effect-detail-pop');
+  if(_old) _old.remove();
+  const pop=document.createElement('div');
+  pop.id='area-effect-detail-pop';
+  pop.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;';
+  pop.innerHTML='<div style="background:linear-gradient(160deg,#2a0a00,#1a0800);border:2px solid #e07030;border-radius:14px;padding:20px 24px;max-width:300px;width:88%;font-family:sans-serif;display:flex;flex-direction:column;gap:10px;align-items:center;">'
+    +'<div style="font-size:32px;">'+aef.icon+'</div>'
+    +'<div style="font-family:\'Cinzel\',serif;font-size:14px;color:#e07030;font-weight:bold;text-align:center;">'+aef.name+'</div>'
+    +'<div style="height:1px;width:100%;background:rgba(224,112,48,.3);"></div>'
+    +'<div style="font-size:11px;color:#ccc;line-height:1.7;text-align:center;">'+aef.fullDesc+'</div>'
+    +'<div style="font-size:9px;color:#888;text-align:center;">エリア効果：全ステージ中に常時適用</div>'
+    +'<button style="margin-top:4px;background:#1a0800;border:2px solid #e07030;border-radius:8px;padding:8px 32px;color:#e07030;font-size:13px;cursor:pointer;touch-action:manipulation;font-family:\'Cinzel\',serif;">閉じる</button>'
+    +'</div>';
+  const closeBtn=pop.querySelector('button');
+  const close=()=>pop.remove();
+  closeBtn.onclick=close; closeBtn.ontouchend=(e)=>{e.preventDefault();close();};
+  pop.addEventListener('click',(e)=>{if(e.target===pop)close();});
+  document.body.appendChild(pop);
+}
 function showStatusDetail(target){
   if(_isGameLocked())return;
   const lines=[];
@@ -8382,6 +8468,7 @@ document.addEventListener('visibilitychange', ()=>{
     // ステージ背景
     'bg1.png','bg2.png','bg3.png','bg4.png',
     'temple1.png','temple2.png','temple3.png','temple4.png',
+    'honoo1.png','honoo2.png','demonlord.png',
     // カードフレーム
     'frame_common.png','frame_uncommon.png','frame_rare.png',
     'frame_epic.png','frame_legendary.png','frame_charge.png','frame_bougai.png',
