@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver189</title>
+<title>DUNGEON WALKER DWCver203</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -676,21 +676,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver189</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver203</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
-  <div id="tap-start-zone" style="position:absolute;top:33.33%;left:0;right:0;height:33.33%;cursor:pointer;touch-action:manipulation;z-index:5;"></div>
+  <div id="tap-start-zone" style="position:absolute;inset:0;cursor:pointer;touch-action:manipulation;z-index:5;"></div>
   
   <div id="btn-rules-title" style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
     background:rgba(201,168,76,.15);border:2px solid rgba(201,168,76,.7);border-radius:10px;
     padding:10px 28px;font-family:'Cinzel',serif;font-size:12px;color:#c9a84c;
-    cursor:pointer;touch-action:manipulation;letter-spacing:2px;
+    cursor:pointer;touch-action:manipulation;letter-spacing:2px;z-index:10;
     box-shadow:0 0 16px rgba(201,168,76,.25);white-space:nowrap;">📜 ルール説明</div>
   <div id="btn-tutorial-title" style="position:absolute;bottom:70px;left:50%;transform:translateX(-50%);
     background:rgba(100,160,255,.15);border:2px solid rgba(100,160,255,.7);border-radius:10px;
     padding:10px 28px;font-family:'Cinzel',serif;font-size:12px;color:#7dd4f8;
-    cursor:pointer;touch-action:manipulation;letter-spacing:2px;
+    cursor:pointer;touch-action:manipulation;letter-spacing:2px;z-index:10;
     box-shadow:0 0 16px rgba(100,160,255,.25);white-space:nowrap;">📖 説明書</div>
 </div>
 
@@ -817,8 +817,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     
     <div id="enemy-area">
       <!-- エリア効果バッジ（ステージ背景左上に重ねて表示） -->
-      <div id="area-effect-box" style="display:none;position:absolute;top:6px;left:6px;z-index:12;background:rgba(180,60,0,.85);border:1px solid #e07030;border-radius:5px;padding:2px 8px;cursor:pointer;touch-action:manipulation;" onclick="showAreaEffectDetail()" ontouchend="event.preventDefault();showAreaEffectDetail();">
-        <span id="area-effect-badge-text" style="font-size:8px;color:#ffaa44;font-weight:bold;font-family:sans-serif;"></span><span class="blink-arrow" style="font-size:7px;color:#e74c3c;margin-left:3px;">▼</span>
+      <div id="area-effect-box" style="display:none;position:absolute;top:6px;left:6px;z-index:12;width:75px;height:75px;background:#000;border:2px solid #c9a84c;border-radius:7px;padding:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;touch-action:manipulation;overflow:hidden;" onclick="showAreaEffectDetail()" ontouchend="event.preventDefault();showAreaEffectDetail();">
+        <div id="area-effect-badge-text" style="font-size:12px;color:#fff;font-weight:bold;font-family:sans-serif;text-align:center;line-height:1.2;"></div>
+        <div id="area-effect-badge-count" style="font-size:22px;color:#fff;font-weight:bold;font-family:sans-serif;line-height:1;"></div>
+        <span class="blink-arrow" style="font-size:7px;color:#e74c3c;margin-top:1px;">▼</span>
       </div>
       <!-- 中段逆向きモヤ：背景::before上(z1)・enemy-sprite下(z3) -->
       <div id="mid-mist-layer" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;">
@@ -1043,10 +1045,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
   <div class="overlay" id="ov-altar" style="gap:14px;">
     <div class="ov-title" style="font-size:16px;color:#d040ff;">🔮 呪いの祭壇</div>
-    <div class="ov-sub">HP15を捧げることで<br>レジェンドカードを1枚得られる</div>
-    <div id="altar-cards" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;width:100%;"></div>
+    <div class="ov-sub" style="color:#fff;font-size:24px;font-weight:bold;font-style:normal;">HP50を捧げることで<br>レジェンドカードを1枚得られる</div>
+    <div id="altar-hp-info" style="font-size:13px;font-family:sans-serif;text-align:center;color:#ccc;"></div>
+    <div id="altar-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;justify-content:center;width:100%;"></div>
     <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
-      <div class="ov-btn" id="altar-accept" style="color:#d040ff;border-color:rgba(208,64,255,.5);background:rgba(208,64,255,.1);">⚡ HP-15で獲得する</div>
+      <div class="ov-btn" id="altar-accept" style="color:#777;border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.03);opacity:.5;pointer-events:none;transition:all .18s;">⚡ HP-50で獲得する</div>
       <div class="ov-btn" id="altar-skip">スキップ</div>
     </div>
   </div>
@@ -1332,16 +1335,16 @@ const CAVE_ENEMIES=[
 // 同じimg（例：cave_enemy3.pngを流用）でも色味を変えて表示できます（CSSフィルター適用）。
 // 例）filter:'hue-rotate(180deg) brightness(0.9)' で青系→赤系などに変換可能。
 const TEMPLE_ENEMIES=[
-  {name:'ブレイズラビット',  icon:'🐇',hp:55,  atk:8,  shield:0,  pattern:['atk','poisonatk','big'],                                        boss:false, img:'cave_enemy2.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズゴブリン',  icon:'👹',hp:65,  atk:10, shield:0,  pattern:['atk','big','atk','ignite'],                                     boss:false, img:'enemy1.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズコボルト',  icon:'🐲',hp:75,  atk:11, shield:5,  pattern:['atk','ignite','big','atk'],                                     boss:false, img:'enemy2.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズスライム',  icon:'🔥',hp:110, atk:13, shield:15, pattern:['bigdef','atk','big','bigdef'],                                  boss:false, img:'cave_enemy1.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズオーク',    icon:'🧌',hp:130, atk:14, shield:10, pattern:['atk','poisonatk','big','bigdef','atk'],                         boss:false, img:'enemy3.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズスケルトン',icon:'💀',hp:160, atk:16, shield:20, pattern:['atk','ignite','big','bigdef','weaken_e'],                       boss:false, img:'enemy4.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズマンイーター',icon:'🌿',hp:180,atk:17, shield:15, pattern:['bigcurse','ignite','summon','big','atk'],                      boss:false, img:'cave_enemy4.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズゴーレム',  icon:'🗿',hp:220, atk:19, shield:20, pattern:['bigdef','quake','big','superbigdef','ignite'],                  boss:false, img:'enemy6.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズトロール',  icon:'🧌',hp:290, atk:22, shield:25, pattern:['ignite','bigcurse','big','superbigdef','bigheal'],              boss:false, img:'cave_enemy5.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズデーモンロード',icon:'😈',hp:450, atk:28, shield:35, pattern:['enervate','big','ignite','reflect_e','bigheal'],               boss:true,  img:'demonlord.png'},
+  {name:'ブレイズラビット',    icon:'🐇',hp:55,  atk:8,  shield:0,  pattern:['ignite','ignite','ignite'],                                              boss:false, img:'cave_enemy2.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズゴブリン',    icon:'👹',hp:65,  atk:10, shield:0,  pattern:['ignite','bigdef','ignite','ignite'],                                     boss:false, img:'enemy1.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズコボルト',    icon:'🐲',hp:75,  atk:11, shield:5,  pattern:['ignite','ignite','curse','ignite'],                                      boss:false, img:'enemy2.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズスライム',    icon:'🔥',hp:110, atk:13, shield:15, pattern:['bigdef','ignite','curse','bigdef'],                                      boss:false, img:'cave_enemy1.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズオーク',      icon:'🧌',hp:130, atk:14, shield:10, pattern:['ignite','ignite','curse','bigdef','ignite'],                             boss:false, img:'enemy3.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズスケルトン',  icon:'💀',hp:160, atk:16, shield:20, pattern:['seal','ignite','bigignite','bigdef','weaken_e'],                         boss:false, img:'enemy4.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズマンイーター',icon:'🌿',hp:180, atk:17, shield:15, pattern:['curse','ignite','bigignite','ignite','ignite'],                          boss:false, img:'cave_enemy4.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズゴーレム',    icon:'🗿',hp:220, atk:19, shield:20, pattern:['bigdef','quake','bigignite','superbigdef','bigignite'],                  boss:false, img:'enemy6.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズトロール',    icon:'🧌',hp:290, atk:22, shield:25, pattern:['bigignite','bigheal','bigignite','reflect_e','bigheal'],                 boss:false, img:'cave_enemy5.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズデーモンロード',icon:'😈',hp:450,atk:28, shield:35, pattern:['superignite','superbigdef','bigignite','superignite','bigheal'],          boss:true,  img:'demonlord.png'},
 ];
 // カード挙動テスト用サンドバッグ（反撃なし・HP実質無限）
 const SANDBAG_ENEMY={name:'サンドバッグ（テスト用）',icon:'🛡️',hp:9999,atk:0,shield:0,pattern:['def'],boss:false,img:null};
@@ -1439,7 +1442,7 @@ let G={};
 function initGame(){
   G={stage:0,areaId:1,playerHp:30,playerMaxHp:30,shield:0,mana:3,manaMax:10,manaRegen:3,atkBuff:0,nextManaBonus:0,weakenTurns:0,weakenHalf:false,weakenHalfTurns:0,invincibleTurns:0,mirrorActive:false,exileOnBattle:[],tempExiled:[],cardGauge:0,chargeType:null,chargeCount:0,chargeActive:false,nextDmgNull:false,nextTurnHealPending:false,regenTurns:0,regenVal:0,doubleNext:false,doubleMultiplier:1,halfShieldLossTurns:0,
      deck:[...STARTER],drawPile:[],discard:[],hand:[],enemy:null,
-     enemyShield:0,enemyPoison:0,enemyAtkDebuff:0,playerPoison:0,playerBurn:0,turnCount:1,phase:'block',
+     enemyShield:0,enemyPoison:0,enemyAtkDebuff:0,playerPoison:0,playerBurn:0,heatCount:0,igniteCostPenalties:[],ignitedCards:{},turnCount:1,phase:'block',
      permAtkBonus:0, initShieldBonus:0, turnStartHealPct:0, firstTurnManaBonus:0,
      gotTurnStartHeal:false, gotFirstTurnMana:false,
      totalDmgDealt:0, totalDmgTaken:0, totalCardsUsed:0, totalTurns:0,
@@ -1500,7 +1503,12 @@ function _startStageBattle(){
   if(_ha) _ha.style.visibility='visible';
   const e=getAreaEnemies()[G.stage];
   G.enemy={...e,curHp:e.hp,patIdx:0};
-  G.enemyShield=e.shield||0; G.enemyPoison=0; G.enemyAtkDebuff=0; G.playerPoison=0; G.playerBurn=0;
+  G.enemyShield=e.shield||0; G.enemyPoison=0; G.enemyAtkDebuff=0; G.playerPoison=0; G.playerBurn=0; G.heatCount=0; G.igniteCostPenalties=[]; G.ignitedCards={};
+  // エリア効果：灼熱の刻印（炎の神殿）ステージ開始時にもカウント加算
+  if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='heatcount'){
+    const _initHeat=4+G.stage; // stage=0-indexed なのでステージ1=+5、ステージ10=+14
+    G.heatCount=_initHeat;
+  }
   G.shield=G.initShieldBonus||0; G.atkBuff=G.permAtkBonus||0;
   G.mana=G.manaRegen+(G.firstTurnManaBonus||0);
   G.nextManaBonus=0; G.invincibleTurns=0; G.mirrorActive=false; G.exileOnBattle=[]; G.weakenHalf=false; G.weakenHalfTurns=0; G.regenTurns=0; G.regenVal=0; G.doubleNext=false; G.halfShieldLossTurns=0; G.cardGauge=0; G.chargeCount=0; G.chargeActive=false; G.nextDmgNull=false; G.nextTurnHealPending=false;
@@ -1653,6 +1661,20 @@ function drawCards(n, isTurnStart=false){
   // 新規ドローカードのインデックスを記録
   const handBefore=G.hand.length-newCards.length;
   G._lastDrawnIndices=newCards.map((_,i)=>handBefore+i);
+  // 炎上コストペナルティ：ドロー時に積まれたペナルティを新規ドローカードに適用
+  if(isTurnStart&&(G.igniteCostPenalties||[]).length>0&&newCards.length>0){
+    G.ignitedCards=G.ignitedCards||{};
+    // ペナルティを1つずつ消費してランダムなドローカードに付与
+    const _shuffledNew=[...Array(newCards.length).keys()].sort(()=>Math.random()-0.5);
+    let _ni=0;
+    while(G.igniteCostPenalties.length>0&&_ni<_shuffledNew.length){
+      const _add=G.igniteCostPenalties.shift();
+      const _handIdx=handBefore+_shuffledNew[_ni++];
+      G.ignitedCards[_handIdx]=(G.ignitedCards[_handIdx]||0)+_add;
+      addLog('🔥 炎上：手札'+(_handIdx+1)+'枚目のカードのコスト+'+_add,'sys');
+    }
+    G.igniteCostPenalties=[]; // 余りは破棄
+  }
   // 封印：ドロー後に最高コストカードを封印
   if(isTurnStart && G.sealThisTurn){
     G.sealThisTurn=false;
@@ -1792,7 +1814,9 @@ function playCard(idx, _isChain){
     const costAdd=soulcrushCount>0?soulcrushCount:0;
     // 脱力D：攻撃力-50%
     const datsuryo=G.hand.some(id=>id==='bougai_datsuryo');
-    const _reducedCost=(isHakiZeroPlay||isFreePass)?0:Math.max(0,c.cost+costAdd-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0));
+    // 炎上コストペナルティ
+    const _ignitePenalty=(G.ignitedCards&&G.ignitedCards[idx])||0;
+    const _reducedCost=(isHakiZeroPlay||isFreePass)?0:Math.max(0,c.cost+costAdd+_ignitePenalty-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0));
     if(G.mana<_reducedCost){addLog('💎 マナ不足！','sys');return;}
     const actualCost=_reducedCost;
     G.mana-=actualCost; G.stageManaSpent=(G.stageManaSpent||0)+actualCost;
@@ -1810,28 +1834,33 @@ function playCard(idx, _isChain){
         addLog('✨ 妨害カード「'+DB[bougaiId].name+'」を除外して発動！','sys');
       }
     }
-    if(handIdx>=0){G.hand.splice(handIdx,1);G.discard.push(cid);}
+    if(handIdx>=0){G.hand.splice(handIdx,1);G.discard.push(cid);
+      // 炎上ペナルティのインデックスを手札の変化に合わせて更新
+      if(G.ignitedCards){
+        const _newIgn={};
+        Object.keys(G.ignitedCards).forEach(k=>{
+          const ki=parseInt(k);
+          if(ki===handIdx) return; // 使ったカード自身は消去
+          const ni=ki>handIdx?ki-1:ki;
+          _newIgn[ni]=((_newIgn[ni]||0)+(G.ignitedCards[k]||0));
+        });
+        G.ignitedCards=_newIgn;
+      }
+    }
     clampPage(); selectedCardIdx=-1;
     if(G.hakiZeroCostCardIds){const zi=G.hakiZeroCostCardIds.indexOf(cid);if(zi>=0)G.hakiZeroCostCardIds.splice(zi,1);}
     sfxCard();
     G.totalCardsUsed=(G.totalCardsUsed||0)+1;
     G.turnCardsUsed=(G.turnCardsUsed||0)+1;
     G.turnCostSum=(G.turnCostSum||0)+actualCost;
-    // エリア効果：灼熱の代償（炎の神殿）使用マナ分のダメージ
+    // エリア効果：灼熱の刻印（炎の神殿）カード使用時マナ分カウント減少
     const _areaEff=AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect;
-    if(_areaEff&&_areaEff.id==='manaburn'&&actualCost>0&&G.invincibleTurns<=0){
-      const _mbDmg=actualCost*2;
-      G.playerHp=Math.max(0,G.playerHp-_mbDmg);
-      addLog('🔥 灼熱の代償: HP-'+_mbDmg,'sys');
-      queueEffect(()=>{
-        spawnDmgNum('-'+_mbDmg,'player-dmg');
-        shakePlayerArea();
-        flashScreen('flash-red');
+    if(_areaEff&&_areaEff.id==='heatcount'&&actualCost>0){
+      const _reduce=Math.min(G.heatCount||0, actualCost);
+      if(_reduce>0){
+        G.heatCount-=_reduce;
+        addLog('🔥 灼熱の刻印: カウント-'+_reduce+'（残'+G.heatCount+'）','sys');
         updateUI();
-      },400);
-      if(G.playerHp<=0){
-        queueEffect(()=>{ defeat('灼熱の代償'); },800);
-        return;
       }
     }
     if(c.type==='attack'){
@@ -2667,6 +2696,25 @@ function processPlayerTurnEnd(onDone){
   let si=0;
   const next=()=>{ if(si<steps.length){ const f=steps[si++]; f(next); } else { onDone(); } };
 
+  // エリア効果：灼熱の刻印（炎の神殿）ターン終了時カウント分ダメージ
+  if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='heatcount'&&(G.heatCount||0)>0){
+    addStep((next)=>{
+      const _hd=G.heatCount;
+      // カウントはリセットせず蓄積（0にしない）
+      G.playerHp=Math.max(0,G.playerHp-_hd);
+      G.totalDmgTaken=(G.totalDmgTaken||0)+_hd;
+      addLog('🔥 灼熱の刻印: HP-'+_hd+'（カウント分ダメージ）','sys');
+      spawnDmgNum('-'+_hd,'player-dmg');
+      shakePlayerArea(); flashScreen('flash-red'); updateUI();
+      if(G.playerHp<=0&&G.deathSaveActive&&!G.deathSaveUsed){
+        G.playerHp=1;G.deathSaveActive=false;G.deathSaveUsed=true;G.deathSaveTriggered=true;
+        addLog('💪 驚異の生命力: 灼熱の刻印致死ダメを耐えた！','sys');
+      }
+      if(G.playerHp<=0){ G.phase='block'; setTimeout(()=>defeat('灼熱の刻印ダメージ'),400); return; }
+      setTimeout(next,600);
+    });
+  }
+
   // 二段構え・三段構え：ターン終了時盾付与
   if(G.endTurnShieldTurns>0){
     addStep((next)=>{
@@ -2780,7 +2828,7 @@ function enemyTurn(){
       def:'🛡️ 防御',bigdef:'🛡️ 大防御',superbigdef:'🛡️ 超防御',
       curse:'☠️ 呪い '+ea,bigcurse:'☠️ 大呪い '+(ea*2),heal:'💚 回復',bigheal:'💚 大回復',
       summon:'🌑 召喚',quake:'🌍 地響き '+ea,seal:'🔒 封印 '+ea,poisonfang:'☠️ 猛毒牙 '+ea,
-      burn:'🔥 火傷 '+ea,ignite:'🔥 炎上 '+ea,weaken_e:'💀 衰弱 '+ea,judgment:'⚖️ 裁き '+ea,heavywound:'💔 重傷 '+ea,
+      burn:'🔥 火傷 '+ea,ignite:'🔥 炎上 '+ea,bigignite:'🔥 大炎上 '+ea,superignite:'🔥 超炎上 '+ea,weaken_e:'💀 衰弱 '+ea,judgment:'⚖️ 裁き '+ea,heavywound:'💔 重傷 '+ea,
       soulcrush:'💀 魂砕き '+ea,curse_bind:'⛓️ 呪縛 '+ea,despair:'😈 絶望 '+ea,
       enervate:'😩 脱力 '+ea,reflect_e:'🔄 反射 '+ea,
     };
@@ -2904,14 +2952,20 @@ function enemyTurn(){
       }
       return; // 死亡時はnextStepへ進まない
     }
-    else if(act==='ignite'){
-      // 炎上付与：ATK + 炎上3層付与（毎ターン固定2ダメ、最大10層キャップ、1層/T減衰）
+    else if(act==='ignite'||act==='bigignite'||act==='superignite'){
+      // 炎上系：ATK + 次ターンドローカードのコスト増加
       enemySpriteAttack();
-      dealToPlayer(ea,e.name+'の炎上🔥');
+      const _ignLabel=act==='superignite'?'超炎上':act==='bigignite'?'大炎上':'炎上';
+      dealToPlayer(ea,e.name+'の'+_ignLabel+'🔥');
       if(G.playerHp>0){
-        G.playerBurn=Math.min(10,(G.playerBurn||0)+3);
-        addLog('🔥 炎上付与！（'+G.playerBurn+'層）','enemy');
-        queueEffect(()=>{spawnDmgNum('🔥炎上+3','player-dmg');sfxPoison();},700);
+        // コスト増加量・枚数の設定
+        const _costAdd=act==='ignite'?1:2; // 炎上+1、大炎上/超炎上+2
+        const _cardNum=act==='superignite'?2:1; // 超炎上のみ2枚、他は1枚
+        // pending配列に積む（次ターンのドロー時に適用）
+        G.igniteCostPenalties=G.igniteCostPenalties||[];
+        for(let _i=0;_i<_cardNum;_i++) G.igniteCostPenalties.push(_costAdd);
+        addLog('🔥 '+_ignLabel+'！次ターンのドローカード'+_cardNum+'枚のコスト+'+_costAdd,'enemy');
+        queueEffect(()=>{spawnDmgNum('🔥'+_ignLabel,'player-dmg');sfxPoison();},700);
         updateUI();
       }
     }
@@ -3038,6 +3092,7 @@ function enemyTurn(){
     G.freePassUsedThisTurn=false; // 踏み倒しは毎ターンリセット（1ターン1度のみ）
     G.poisonDoubleTurn=false; // 汚染世界は1ターン限り
     G.chargeUsedThisTurn=false; // チャージ使用済みリセット
+    G.ignitedCards={}; // 炎上コストペナルティ：ターン終了時リセット
     G.dokushiPoisonDouble=false; // 錬金術師チャージ：未使用でも次ターンへ引き継がない
     // 狂戦士：累積ターン開始マナ+N
     if(G.berserkManaBonus>0){
@@ -3098,6 +3153,13 @@ function enemyTurn(){
       const dsHeal=healPlayer(10+(G.healBuff||0));
       addLog('💪 驚異の生命力: HP+'+dsHeal+'！','sys');
       queueEffect(()=>spawnDmgNum('+'+dsHeal,'heal'),100);
+      updateUI();
+    }
+    // エリア効果：灼熱の刻印（炎の神殿）ターン開始時カウント増加
+    if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='heatcount'){
+      const _heatAdd=4+G.stage;
+      G.heatCount=(G.heatCount||0)+_heatAdd;
+      addLog('🔥 灼熱の刻印: カウント+'+_heatAdd+'（現在'+G.heatCount+'）','sys');
       updateUI();
     }
     // ターン開始時シールド30%減少（切り捨て）※剛体中は15%減（切り捨て）
@@ -3347,6 +3409,8 @@ function updateIntent(){
     poisonfang:'☠️ 猛毒牙 '+ea,
     burn:     '🔥 火傷 '+ea,
     ignite:   '🔥 炎上 '+ea,
+    bigignite:'🔥 大炎上 '+ea,
+    superignite:'🔥 超炎上 '+ea,
     weaken_e: '💀 衰弱 '+ea,
     judgment: '⚖️ 裁き '+ea,
     heavywound:'💔 重傷 '+ea,
@@ -3374,7 +3438,9 @@ function updateIntent(){
     seal:     '🔒 封印\nダメージ: '+ea+'\n次のターン、手札で最もコストの高いカードが使用不可',
     poisonfang:'☠️ 猛毒牙\nダメージ: '+ea+'\n猛毒牙Dカード×2をデッキに追加（使用時HP-5・毒+3）',
     burn:     '🔥 火傷\nダメージ: '+ea+'\n火傷Dカード×3をデッキに追加（ターン終了時HP-5/枚）',
-    ignite:   '🔥 炎上\nダメージ: '+ea+'\n炎上3層付与（毎ターン開始時HP-2固定、層数は毎ターン1減衰、最大10層）',
+    ignite:   '🔥 炎上\nダメージ: '+ea+'\n次ターンドロー1枚のコスト+1（ターン終了時リセット）',
+    bigignite:'🔥 大炎上\nダメージ: '+ea+'\n次ターンドロー1枚のコスト+2（ターン終了時リセット）',
+    superignite:'🔥 超炎上\nダメージ: '+ea+'\n次ターンドロー2枚のコスト+2（ターン終了時リセット）',
     weaken_e: '💀 衰弱\nダメージ: '+ea+'\n2ターン間、シールドの防御効果が半減',
     judgment: '⚖️ 裁き\nダメージ: '+ea+'\n次のターン開始時マナ-1',
     heavywound:'💔 重傷\nダメージ: '+ea+'\n3ターン間、回復効果が半減',
@@ -3727,20 +3793,20 @@ function closeReward(){
   if(G.areaId===2){
     if(G.stage===1){
       showStatUpEvent(true); // Stage1後：初期強化
-    } else if(G.stage===2||G.stage===5||G.stage===7){
-      showStatUpEvent(false); // Stage2・5・7後：通常強化
+    } else if(G.stage===2||G.stage===5){
+      showStatUpEvent(false); // Stage2・5後：通常強化
     } else if(G.stage===3||G.stage===6){
       G._postEventStatUp=true;
       showSpringOrSmithChoice(); // Stage3・6後：泉 or 鍛冶屋
     } else if(G.stage===4){
       G._postEventStatUp=true;
       showBanishEvent(); // Stage4後：廃棄
-    } else if(G.stage===8){
-      showSuperStatUpEvent(); // Stage8後：超強化
+    } else if(G.stage===7||G.stage===8){
+      showSuperStatUpEvent(); // Stage7・8後：超強化
     } else if(G.stage===9){
-      showStatUpEvent(false); // Stage9後：強化
+      showAltarBeforeEnding(showSuperStatUpEvent); // Stage9後：祭壇→超強化（ラスボス前）
     } else if(G.stage===10){
-      showAltarBeforeEnding(); // ラスボス撃破後：祭壇→クリア
+      showClearStats(); // ラスボス撃破後：クリア画面
     } else {
       startStage();
     }
@@ -3761,7 +3827,7 @@ function closeReward(){
   } else if(G.stage===6){
     G._postEventStatUp=true;
     showBanishEvent();
-  } else if(G.stage===9||G.stage===11||G.stage===14){
+  } else if(G.stage===9||G.stage===11){
     showSuperStatUpEvent();
   } else if(G.stage===12){
     G._postEventStatUp=true;
@@ -3769,8 +3835,10 @@ function closeReward(){
   } else if(G.stage===13){
     G._postEventStatUp=true;
     showBanishEvent();
+  } else if(G.stage===14){
+    showAltarBeforeEnding(showSuperStatUpEvent); // Stage14後：祭壇→超強化（ラスボス前）
   } else if(G.stage===15){
-    showAltarBeforeEnding();
+    showClearStats(); // ラスボス撃破後：クリア画面
   } else {
     startStage();
   }
@@ -4206,11 +4274,11 @@ const AREA_DATA = [
     difficulty: '★★★★',
     desc: '灼熱の炎に満ちた神殿。炎系の強敵が待ち受ける',
     areaEffect: {
-      id: 'manaburn',
-      name: '灼熱の代償',
+      id: 'heatcount',
+      name: '灼熱の刻印',
       icon: '🔥',
-      shortDesc: 'カード使用ごとに使用マナ×2のダメージ',
-      fullDesc: 'カードを使用するたびに、そのカードの使用マナ×2のダメージを受ける。マナ0のカードはダメージなし。',
+      shortDesc: 'ターン開始時カウント増加、終了時ダメージ',
+      fullDesc: 'ターン開始時に「4＋ステージ数」カウントが増加する。ターン終了時にカウント分のダメージを受ける。カードを使用するたびその使用マナ分カウントが減少する（0未満にはならない）。',
     },
   },
 ];
@@ -4877,8 +4945,10 @@ function updateUI(){
   const _aefBox=document.getElementById('area-effect-box');
   if(_aefBox){
     if(_aef){
-      document.getElementById('area-effect-badge-text').textContent=_aef.icon+' '+_aef.name;
-      _aefBox.style.display='block';
+      document.getElementById('area-effect-badge-text').textContent=_aef.name;
+      const _countEl=document.getElementById('area-effect-badge-count');
+      if(_countEl) _countEl.textContent=(_aef.id==='heatcount')?(G.heatCount||0):'';
+      _aefBox.style.display='flex';
     } else {
       _aefBox.style.display='none';
     }
@@ -5444,7 +5514,9 @@ function renderHand(){
     const isHakiZero=G.hakiZeroCostCardIds&&G.hakiZeroCostCardIds.includes(cid)&&G.hand.includes(cid);
     // 魂砕きD: 全コスト+1
     const costAdd=c.type!=='bougai'?soulcrushCount:0;
-    const reducedCost=isHakiZero?0:Math.max(0,c.cost+costAdd-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0));
+    // 炎上コストペナルティ
+    const ignitePenalty=(G.ignitedCards&&G.ignitedCards[i])||0;
+    const reducedCost=isHakiZero?0:Math.max(0,c.cost+costAdd+ignitePenalty-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0));
     // 踏み倒し発動中はコスト0扱い（ただし対象カードのコストが閾値超えの場合のみ）
     const isFreePassTarget = G.freeNextCard && c.id!=='freePass' && c.cost>(G.freePassManaAtUse||0);
     const effectiveCost = isFreePassTarget ? 0 : reducedCost;
@@ -5766,7 +5838,7 @@ function renderHand(){
       '<div class="card-band" style="'+(frameImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
-        '<div class="card-cost '+c.rarity+'">'+(isHakiZero?'<span style="color:#f0c040">0</span>':isFreePassTarget?'<span class="freepass-cost-blink" data-orig="'+reducedCost+'">0</span>':reducedCost)+'</div>'+
+        '<div class="card-cost '+c.rarity+'">'+(isHakiZero?'<span style="color:#f0c040">0</span>':isFreePassTarget?'<span class="freepass-cost-blink" data-orig="'+reducedCost+'">0</span>':ignitePenalty>0?'<span style="color:#e74c3c;font-weight:bold;">'+reducedCost+'</span>':reducedCost)+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
@@ -6050,9 +6122,32 @@ function showDuplicateEvent(){
   showOv('ov-duplicate');
 }
 
-// エンディング前の呪いの祭壇（スキップ or 獲得→クリア画面）
-function showAltarBeforeEnding(){
+// ラスボス前の祭壇（スキップ or 獲得→nextFnへ、省略時はラスボス戦へ）
+function showAltarBeforeEnding(nextFn){
+  const goNext=nextFn||startStage;
   const ac=document.getElementById('altar-cards'); ac.innerHTML='';
+  const acceptBtn=document.getElementById('altar-accept');
+  const hpInfo=document.getElementById('altar-hp-info');
+  const hasEnoughHp=G.playerHp>50;
+  const hpAfter=Math.max(G.playerHp-50,0);
+  hpInfo.innerHTML='現在HP: <b style="color:#fff;">'+G.playerHp+'</b> → 獲得後: <b style="color:'+(hasEnoughHp?'#4fd1ff':'#e74c3c')+';">'+hpAfter+'</b>'+
+    (hasEnoughHp?'':'<br><span style="color:#e74c3c;font-weight:bold;">⚠ HPが足りないため獲得できません</span>');
+  const setAcceptActive=(active)=>{
+    if(active){
+      acceptBtn.style.color='#d040ff';
+      acceptBtn.style.borderColor='rgba(208,64,255,.5)';
+      acceptBtn.style.background='rgba(208,64,255,.1)';
+      acceptBtn.style.opacity='1';
+      acceptBtn.style.pointerEvents='auto';
+    } else {
+      acceptBtn.style.color='#777';
+      acceptBtn.style.borderColor='rgba(255,255,255,.15)';
+      acceptBtn.style.background='rgba(255,255,255,.03)';
+      acceptBtn.style.opacity='.5';
+      acceptBtn.style.pointerEvents='none';
+    }
+  };
+  setAcceptActive(false); // カード未選択のうちは押せない見た目に
   const legendPool=[...CARD_POOL.legendary,...(CARD_POOL_LATE.legendary||[])];
   const pool=[...new Set(legendPool)].sort(()=>Math.random()-.5).slice(0,3);
   let chosenId=null;
@@ -6077,27 +6172,27 @@ function showAltarBeforeEnding(){
       ac.querySelectorAll('.card').forEach(el=>{el.style.outline='';el.style.boxShadow='';});
       d.style.outline='3px solid #d040ff'; d.style.boxShadow='0 0 16px rgba(208,64,255,.8)';
       chosenId=cid;
+      setAcceptActive(hasEnoughHp); // HPが足りない場合はカードを選んでも非活性のまま
     };
     bindCardTouch(d, c, pick);
     ac.appendChild(d);
   });
-  const acceptBtn=document.getElementById('altar-accept');
   acceptBtn.onclick=()=>{
     if(!chosenId){addLog('💢 カードを選んでください','sys');return;}
-    if(G.playerHp<=15){addLog('💢 HPが足りない！（15以上必要）','sys');return;}
-    G.playerHp-=15;
+    if(G.playerHp<=50){addLog('💢 HPが足りない！（50以上必要）','sys');return;}
+    G.playerHp-=50;
     G.deck.push(chosenId);
-    addLog('🔮 祭壇: HP-15 → 「'+DB[chosenId].name+'」獲得！','sys');
-    spawnDmgNum('-15','player-dmg'); updateUI();
+    addLog('🔮 祭壇: HP-50 → 「'+DB[chosenId].name+'」獲得！','sys');
+    spawnDmgNum('-50','player-dmg'); updateUI();
     hideOv('ov-altar');
-    showClearStats(); // 内部で動的生成
+    goNext();
   };
-  // スキップはクリア画面へ
+  // スキップもgoNextへ
   const skipBtn=document.getElementById('altar-skip');
   if(skipBtn){
     const origBind=skipBtn.onclick;
-    skipBtn.onclick=()=>{hideOv('ov-altar');showClearStats();};
-    skipBtn.ontouchend=(e)=>{e.preventDefault();hideOv('ov-altar');showClearStats();};
+    skipBtn.onclick=()=>{hideOv('ov-altar');goNext();};
+    skipBtn.ontouchend=(e)=>{e.preventDefault();hideOv('ov-altar');goNext();};
   }
   showOv('ov-altar');
 }
