@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver203</title>
+<title>DUNGEON WALKER DWCver208</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -58,7 +58,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #enemy-info-bar{display:flex;align-items:center;gap:4px;min-height:22px;flex-shrink:0;}
 #enemy-intent{font-size:9px;color:#ffe44e;font-weight:bold;background:rgba(0,0,0,.7);border:2px solid rgba(255,228,78,.6);border-radius:5px;padding:3px 7px 3px 7px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;touch-action:manipulation;position:relative;}
 #enemy-intent::after{content:'▼';font-size:7px;color:#e74c3c;margin-left:4px;}
-#enemy-name{font-size:10px;color:#fff;letter-spacing:1px;font-weight:bold;background:rgba(0,0,0,.8);border:1.5px solid rgba(255,255,255,.4);border-radius:5px;padding:2px 8px;white-space:nowrap;flex-shrink:0;}
+#enemy-name{font-size:10px;color:#fff;letter-spacing:1px;font-weight:bold;background:rgba(0,0,0,.8);border:3px solid rgba(255,255,255,.4);border-radius:5px;padding:2px 8px;white-space:nowrap;flex-shrink:0;min-width:64px;min-height:16px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;}
 
 /* 敵エリア */
 #enemy-area{border-radius:8px;flex-shrink:0;height:165px;overflow:hidden;position:relative;background-size:cover;background-position:center;background-color:#111;}
@@ -676,7 +676,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver203</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver208</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -1313,21 +1313,21 @@ const ENEMIES=[
   {name:'ヴァンパイア',  icon:'🧛',hp:80,  atk:14, shield:5,  pattern:['atk','heal','big','drain'],                                  boss:false, img:'enemy5.png'},
   {name:'ゴーレム',      icon:'🗿',hp:100, atk:15, shield:15, pattern:['bigdef','atk','big','bigdef','atk'],                         boss:false, img:'enemy6.png'},
   {name:'ダークナイト',  icon:'🖤',hp:120, atk:15, shield:15, pattern:['atk','atk','big','bigdef','atk'],                            boss:false, img:'enemy7.png'},
-  {name:'死霊術師',      icon:'🧙',hp:150, atk:15, shield:20, pattern:['bigcurse','poisonatk','summon','big','atk'],                 boss:false, img:'enemy8.png'},
-  {name:'SHADOW LORD',   icon:'👿',hp:220, atk:20, shield:20, pattern:['poisonatk','big','bigdef','bigcurse','bigheal','big'],        boss:true,  img:'enemy9.png'},
+  {name:'ネクロマンサー',      icon:'🧙',hp:150, atk:15, shield:20, pattern:['bigcurse','poisonatk','summon','big','atk'],                 boss:false, img:'enemy8.png'},
+  {name:'シャドウロード',   icon:'👿',hp:220, atk:20, shield:20, pattern:['poisonatk','big','bigdef','bigcurse','bigheal','big'],        boss:true,  img:'enemy9.png'},
   {name:'ベヒモス',      icon:'🦣',hp:250, atk:20, shield:20, pattern:['bigdef','quake','big','superbigdef','quake'],                 boss:false, img:'enemy10.png'},
   {name:'ヒドラ',        icon:'🐍',hp:280, atk:23, shield:20, pattern:['seal','poisonfang','superbigdef','big','bigheal'],            boss:false, img:'enemy11.png'},
   {name:'ケルベロス',    icon:'🐺',hp:300, atk:25, shield:20, pattern:['burn','weaken_e','judgment','big','superbigdef'],             boss:false, img:'enemy12.png'},
   {name:'リッチ',        icon:'💀',hp:350, atk:26, shield:30, pattern:['heavywound','soulcrush','big','bigheal','bigcurse'],          boss:false, img:'enemy13.png'},
   {name:'デーモン',      icon:'😈',hp:400, atk:28, shield:30, pattern:['curse_bind','despair','big','superbigdef','big'],             boss:false, img:'enemy14.png'},
-  {name:'古代の龍神',    icon:'🐲',hp:500, atk:30, shield:40, pattern:['enervate','big','poisonfang','reflect_e','bigheal'],          boss:true,  img:'enemy15.png'},
+  {name:'エンシェントドラゴン',    icon:'🐲',hp:500, atk:30, shield:40, pattern:['enervate','big','poisonfang','reflect_e','bigheal'],          boss:true,  img:'enemy15.png'},
 ];
 // 始まりの洞窟 敵データ
 const CAVE_ENEMIES=[
   {name:'スライム',   icon:'🟢',hp:40, atk:6,  shield:0, pattern:['atk','big','atk'],           boss:false, img:'cave_enemy1.png'},
-  {name:'角ウサギ',   icon:'🐇',hp:45, atk:7,  shield:0, pattern:['atk','big','atk'],           boss:false, img:'cave_enemy2.png'},
-  {name:'大蜂',       icon:'🐝',hp:50, atk:8,  shield:5, pattern:['poisonatk','poisonatk','big'],boss:false, img:'cave_enemy3.png'},
-  {name:'食人草',     icon:'🌿',hp:60, atk:9,  shield:4, pattern:['curse','curse','poisonatk'],  boss:false, img:'cave_enemy4.png'},
+  {name:'ホーンラビット', icon:'🐇',hp:45, atk:7,  shield:0, pattern:['atk','big','atk'],           boss:false, img:'cave_enemy2.png'},
+  {name:'キラービー',       icon:'🐝',hp:50, atk:8,  shield:5, pattern:['poisonatk','poisonatk','big'],boss:false, img:'cave_enemy3.png'},
+  {name:'マンイーター',     icon:'🌿',hp:60, atk:9,  shield:4, pattern:['curse','curse','poisonatk'],  boss:false, img:'cave_enemy4.png'},
   {name:'トロール',   icon:'🧌',hp:70, atk:10, shield:5, pattern:['poisonatk','bigheal','big'],  boss:true,  img:'cave_enemy5.png'},
 ];
 // 炎の神殿 敵データ（areaId:2）※「炎上」状態異常（ignite）がエリア固有特性
@@ -1715,7 +1715,8 @@ function showReconsiderUI(){
   });
   const ok=overlay.querySelector('#reconsider-ok');
   const cancel=overlay.querySelector('#reconsider-cancel');
-  const doOk=(ev)=>{if(ev.type==='touchend')ev.preventDefault();
+  let _handledR=false;
+  const doOk=(ev)=>{if(ev.type==='touchend')ev.preventDefault();if(_handledR)return;_handledR=true;
     const indices=[...selected].sort((a,b)=>b-a);
     indices.forEach(i=>{const id=G.hand.splice(i,1)[0];G.discard.push(id);});
     (function(){var _el=overlay;if(_el&&_el.parentNode)_el.parentNode.removeChild(_el);})();
@@ -1724,7 +1725,7 @@ function showReconsiderUI(){
     addLog('🔁 考え直し: '+selected.size+'枚捨て→'+drawN+'枚ドロー','sys');
     updateUI();renderHand();
   };
-  const doCancel=(ev)=>{if(ev.type==='touchend')ev.preventDefault();(function(){var _el=overlay;if(_el&&_el.parentNode)_el.parentNode.removeChild(_el);})();updateUI();renderHand();};
+  const doCancel=(ev)=>{if(ev.type==='touchend')ev.preventDefault();if(_handledR)return;_handledR=true;(function(){var _el=overlay;if(_el&&_el.parentNode)_el.parentNode.removeChild(_el);})();updateUI();renderHand();};
   ok.addEventListener('click',doOk);ok.addEventListener('touchend',doOk);
   cancel.addEventListener('click',doCancel);cancel.addEventListener('touchend',doCancel);
   appendToApp(overlay);
@@ -4233,8 +4234,9 @@ function _showStatUpUI(opts, onDone){
       cancelBtn.style.cssText='flex:1;background:rgba(60,20,20,.8);border:2px solid #aa4444;border-radius:7px;padding:10px 0;text-align:center;font-family:\'Cinzel\',serif;font-size:12px;color:#ee4444;cursor:pointer;touch-action:manipulation;letter-spacing:1px;';
       cancelBtn.textContent='キャンセル';
       const close=()=>{if(popup.parentNode)popup.parentNode.removeChild(popup);};
-      const doOk=(e)=>{if(e.type==='touchend')e.preventDefault();sfxConfirm();close();opt.apply();updateUI();hideOv('ov-statup');onDone();};
-      const doCancel=(e)=>{if(e.type==='touchend')e.preventDefault();sfxCancel();close();};
+      let _handled=false;
+      const doOk=(e)=>{if(e.type==='touchend')e.preventDefault();if(_handled)return;_handled=true;sfxConfirm();close();opt.apply();updateUI();hideOv('ov-statup');onDone();};
+      const doCancel=(e)=>{if(e.type==='touchend')e.preventDefault();if(_handled)return;_handled=true;sfxCancel();close();};
       okBtn.addEventListener('click',doOk); okBtn.addEventListener('touchend',doOk);
       cancelBtn.addEventListener('click',doCancel); cancelBtn.addEventListener('touchend',doCancel);
       popup.addEventListener('click',(e)=>{if(e.target===popup)doCancel(e);});
@@ -4583,8 +4585,10 @@ function showStatUpEvent(stage2Only, onDone){
       cancelBtn.style.cssText='flex:1;background:rgba(60,20,20,.8);border:2px solid #aa4444;border-radius:7px;padding:10px 0;text-align:center;font-family:\'Cinzel\',serif;font-size:12px;color:#ee4444;cursor:pointer;touch-action:manipulation;letter-spacing:1px;';
       cancelBtn.textContent='キャンセル';
       const close=()=>{if(popup.parentNode)popup.parentNode.removeChild(popup);};
+      let _handled2=false;
       const doOk=(e)=>{
         if(e.type==='touchend')e.preventDefault();
+        if(_handled2)return; _handled2=true;
         sfxConfirm(); close();
         opt.apply();
         hideOv('ov-statup');
@@ -4592,7 +4596,7 @@ function showStatUpEvent(stage2Only, onDone){
         else if(G._postEventStatUp){ G._postEventStatUp=false; startStage(); }
         else { startStage(); }
       };
-      const doCancel=(e)=>{if(e.type==='touchend')e.preventDefault();sfxCancel();close();};
+      const doCancel=(e)=>{if(e.type==='touchend')e.preventDefault();if(_handled2)return;_handled2=true;sfxCancel();close();};
       okBtn.addEventListener('click',doOk); okBtn.addEventListener('touchend',doOk);
       cancelBtn.addEventListener('click',doCancel); cancelBtn.addEventListener('touchend',doCancel);
       popup.addEventListener('click',(e)=>{if(e.target===popup)doCancel(e);});
@@ -4667,15 +4671,17 @@ function _doSuperStatUp(){
       cancelBtn.style.cssText='flex:1;background:rgba(60,20,20,.8);border:2px solid #aa4444;border-radius:7px;padding:10px 0;text-align:center;font-family:\'Cinzel\',serif;font-size:12px;color:#ee4444;cursor:pointer;touch-action:manipulation;letter-spacing:1px;';
       cancelBtn.textContent='キャンセル';
       const close=()=>{if(popup.parentNode)popup.parentNode.removeChild(popup);};
+      let _handled=false;
       const doOk=(e)=>{
         if(e.type==='touchend')e.preventDefault();
+        if(_handled)return; _handled=true;
         sfxConfirm(); close();
         opt.apply();
         G._superStatRemain--;
         if(G._superStatRemain>0){ _doSuperStatUp(); }
         else { hideOv('ov-statup'); startStage(); }
       };
-      const doCancel=(e)=>{if(e.type==='touchend')e.preventDefault();sfxCancel();close();};
+      const doCancel=(e)=>{if(e.type==='touchend')e.preventDefault();if(_handled)return;_handled=true;sfxCancel();close();};
       okBtn.addEventListener('click',doOk); okBtn.addEventListener('touchend',doOk);
       cancelBtn.addEventListener('click',doCancel); cancelBtn.addEventListener('touchend',doCancel);
       popup.addEventListener('click',(e)=>{if(e.target===popup)doCancel(e);});
@@ -5015,7 +5021,13 @@ function updateUI(){
     spriteEl._currentSrc=null;
     spriteEl.textContent=e.icon;
   }
-  document.getElementById('enemy-name').textContent=(e.boss?'👑 ':'')+e.name;
+  {
+    const _enNameEl=document.getElementById('enemy-name');
+    _enNameEl.textContent=(e.boss?'👑 ':'')+e.name;
+    // 長い名前は自動的にフォントサイズを縮小（10px基準、6文字超から段階的に縮小、最小7px）
+    const _nameLen=e.name.length;
+    _enNameEl.style.fontSize=(_nameLen<=6?10:Math.max(7,10-(_nameLen-6)*0.6))+'px';
+  }
   const tg=document.getElementById('enemy-tags');
   const _tagHTML=(G.enemyShield>0?'<span class="tag shield">🛡️'+G.enemyShield+'</span>':'')
     +(G.enemyPoison>0?'<span class="tag poison">☠️'+G.enemyPoison+'</span>':'')
@@ -6177,9 +6189,12 @@ function showAltarBeforeEnding(nextFn){
     bindCardTouch(d, c, pick);
     ac.appendChild(d);
   });
-  acceptBtn.onclick=()=>{
+  let _altarHandled=false;
+  const doAccept=()=>{
+    if(_altarHandled)return;
     if(!chosenId){addLog('💢 カードを選んでください','sys');return;}
     if(G.playerHp<=50){addLog('💢 HPが足りない！（50以上必要）','sys');return;}
+    _altarHandled=true;
     G.playerHp-=50;
     G.deck.push(chosenId);
     addLog('🔮 祭壇: HP-50 → 「'+DB[chosenId].name+'」獲得！','sys');
@@ -6187,12 +6202,14 @@ function showAltarBeforeEnding(nextFn){
     hideOv('ov-altar');
     goNext();
   };
+  acceptBtn.onclick=doAccept;
+  acceptBtn.ontouchend=(e)=>{e.preventDefault();doAccept();};
   // スキップもgoNextへ
   const skipBtn=document.getElementById('altar-skip');
   if(skipBtn){
-    const origBind=skipBtn.onclick;
-    skipBtn.onclick=()=>{hideOv('ov-altar');goNext();};
-    skipBtn.ontouchend=(e)=>{e.preventDefault();hideOv('ov-altar');goNext();};
+    const doSkip=()=>{if(_altarHandled)return;_altarHandled=true;hideOv('ov-altar');goNext();};
+    skipBtn.onclick=doSkip;
+    skipBtn.ontouchend=(e)=>{e.preventDefault();doSkip();};
   }
   showOv('ov-altar');
 }
@@ -7009,8 +7026,9 @@ function showCardDetailWithConfirm(c, onConfirm){
   cancelBtn.textContent='キャンセル';
 
   const close=()=>{if(popup.parentNode)popup.parentNode.removeChild(popup);};
-  const doOk=(e)=>{if(e.type==='touchend')e.preventDefault();sfxConfirm();close();onConfirm();};
-  const doCancel=(e)=>{if(e.type==='touchend')e.preventDefault();sfxCancel();close();};
+  let _handledC1=false;
+  const doOk=(e)=>{if(e.type==='touchend')e.preventDefault();if(_handledC1)return;_handledC1=true;sfxConfirm();close();onConfirm();};
+  const doCancel=(e)=>{if(e.type==='touchend')e.preventDefault();if(_handledC1)return;_handledC1=true;sfxCancel();close();};
   okBtn.addEventListener('click',doOk); okBtn.addEventListener('touchend',doOk);
   cancelBtn.addEventListener('click',doCancel); cancelBtn.addEventListener('touchend',doCancel);
   popup.addEventListener('click',(e)=>{if(e.target===popup)doCancel(e);});
@@ -7215,8 +7233,9 @@ function showSimpleConfirm(title, desc, onConfirm){
   cancelBtn.style.cssText='flex:1;background:rgba(60,20,20,.8);border:2px solid #aa4444;border-radius:7px;padding:10px 0;text-align:center;font-family:\'Cinzel\',serif;font-size:12px;color:#ee4444;cursor:pointer;touch-action:manipulation;letter-spacing:1px;';
   cancelBtn.textContent='キャンセル';
   const close=()=>{if(popup.parentNode)popup.parentNode.removeChild(popup);};
-  const doOk=(e)=>{if(e.type==='touchend')e.preventDefault();sfxConfirm();close();onConfirm();};
-  const doCancel=(e)=>{if(e.type==='touchend')e.preventDefault();sfxCancel();close();};
+  let _handledC2=false;
+  const doOk=(e)=>{if(e.type==='touchend')e.preventDefault();if(_handledC2)return;_handledC2=true;sfxConfirm();close();onConfirm();};
+  const doCancel=(e)=>{if(e.type==='touchend')e.preventDefault();if(_handledC2)return;_handledC2=true;sfxCancel();close();};
   okBtn.addEventListener('click',doOk); okBtn.addEventListener('touchend',doOk);
   cancelBtn.addEventListener('click',doCancel); cancelBtn.addEventListener('touchend',doCancel);
   popup.addEventListener('click',(e)=>{if(e.target===popup)doCancel(e);});
@@ -7494,7 +7513,6 @@ function executeChargeEffect(){
   }
 }
 bind('duplicate-skip',()=>{hideOv('ov-duplicate');afterEventNext()});
-bind('altar-skip',()=>{hideOv('ov-altar');startStage();});
 bind('btn-rules-ingame',()=>{ if(_isGameLocked())return; showOv('ov-rules'); });
 
 // =============================================
