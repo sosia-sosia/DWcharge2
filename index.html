@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver208</title>
+<title>DUNGEON WALKER DWCver239</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -25,14 +25,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     position:relative;
     flex-shrink:0;
   }
-  /* fixed要素をappの幅に収める */
-  .overlay:not(#ov-over):not(#ov-clear){position:absolute !important;}
+  /* fixed要素をappの幅に収める（#app内側の要素） */
+  .overlay:not(#ov-over):not(#ov-clear):not(#ov-admin):not(#ov-monster-viewer):not(#ov-save-delete-confirm):not(#ov-gamedata){position:absolute !important;}
   /* ov-over/ov-clear は動的生成に変更したため position指定不要 */
   #ov-curtain,#confirm-box{position:absolute !important;width:100% !important;}
   #turn-slide{position:absolute !important;}
   #charge-center-display{position:absolute !important;}
-  #start-screen,#tap-to-start-screen,#op-screen{position:absolute !important;width:100% !important;}
   #card-use-popup,#card-detail-popup{position:absolute !important;}
+  #effect-layer,#flash-overlay,#low-hp-vignette,#ov-area-confirm,#ov-ad{position:absolute !important;}
+  #stage-intro-screen{position:absolute !important;}
+
+  /* #appの外側（body直下）にある起動シーケンス系の画面は、
+     position:fixedのまま画面中央に420px幅で表示する */
+  #start-screen,#tap-to-start-screen,#op-screen,
+  #company-logo-screen,#logo-screen,
+  #ov-admin,#ov-monster-viewer,#ov-save-delete-confirm,#ov-gamedata{
+    position:fixed !important;
+    left:50% !important;
+    right:auto !important;
+    width:420px !important;
+    max-width:420px !important;
+    transform:translateX(-50%) !important;
+  }
 }
 
 #top-bar{background:linear-gradient(180deg,#0c0818,#110d1a);border-bottom:1px solid rgba(201,168,76,.22);padding:7px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 16px rgba(0,0,0,.6);}
@@ -61,7 +75,38 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #enemy-name{font-size:10px;color:#fff;letter-spacing:1px;font-weight:bold;background:rgba(0,0,0,.8);border:3px solid rgba(255,255,255,.4);border-radius:5px;padding:2px 8px;white-space:nowrap;flex-shrink:0;min-width:64px;min-height:16px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;}
 
 /* 敵エリア */
-#enemy-area{border-radius:8px;flex-shrink:0;height:165px;overflow:hidden;position:relative;background-size:cover;background-position:center;background-color:#111;}
+#enemy-area{border-radius:8px;flex-shrink:0;height:165px;overflow:hidden;position:relative;background-size:cover;background-position:center;background-color:#111;transition:border-color .4s;border:2px solid transparent;}
+
+/* エリア別パーティクル＆アクセントカラー */
+#area-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3;}
+#area-particles span{position:absolute;bottom:-10px;width:4px;height:4px;border-radius:50%;opacity:0;animation:particle-float 5.5s linear infinite;}
+#area-particles span:nth-child(1){left:6%;animation-delay:0s;}
+#area-particles span:nth-child(2){left:20%;animation-delay:.9s;}
+#area-particles span:nth-child(3){left:37%;animation-delay:1.8s;}
+#area-particles span:nth-child(4){left:54%;animation-delay:2.7s;}
+#area-particles span:nth-child(5){left:71%;animation-delay:3.6s;}
+#area-particles span:nth-child(6){left:88%;animation-delay:4.5s;}
+@keyframes particle-float{0%{transform:translateY(0) translateX(0);opacity:0;}10%{opacity:.75;}50%{transform:translateY(-85px) translateX(6px);}90%{opacity:.3;}100%{transform:translateY(-160px) translateX(-5px);opacity:0;}}
+#enemy-area.area-cave{border-color:rgba(139,107,61,.7);}
+#enemy-area.area-cave #area-particles span{background:radial-gradient(circle,#c9a878,transparent);box-shadow:0 0 4px #8b6b3d;}
+#enemy-area.area-ruins{border-color:rgba(74,120,192,.7);}
+#enemy-area.area-ruins #area-particles span{background:radial-gradient(circle,#c0d4ff,transparent);box-shadow:0 0 4px #4a78c0;}
+#enemy-area.area-temple{border-color:rgba(192,57,43,.75);}
+#enemy-area.area-temple #area-particles span{background:radial-gradient(circle,#ffb060,transparent);box-shadow:0 0 5px #c0392b;width:5px;height:5px;}
+
+/* HP低下時の警告(画面端の脈動) */
+#low-hp-vignette{position:fixed;inset:0;pointer-events:none;z-index:9997;opacity:0;transition:opacity .5s;box-shadow:inset 0 0 60px 18px rgba(220,20,20,.55);}
+#low-hp-vignette.active{opacity:1;animation:low-hp-pulse 1.4s ease-in-out infinite;}
+@keyframes low-hp-pulse{0%,100%{box-shadow:inset 0 0 60px 18px rgba(220,20,20,.4);}50%{box-shadow:inset 0 0 85px 26px rgba(220,20,20,.75);}}
+
+/* レジェンダリーカード獲得演出 */
+.card.legendary.legendary-get-flash{animation:legendary-get-anim .9s ease-out;}
+@keyframes legendary-get-anim{
+  0%{transform:scale(.4) rotate(-8deg);opacity:0;box-shadow:0 0 0 rgba(255,180,60,0);}
+  45%{transform:scale(1.18) rotate(3deg);opacity:1;box-shadow:0 0 40px rgba(255,180,60,1);}
+  70%{transform:scale(.95) rotate(-1deg);box-shadow:0 0 26px rgba(255,180,60,.9);}
+  100%{transform:scale(1) rotate(0deg);box-shadow:0 4px 14px rgba(0,0,0,.6),0 0 22px rgba(255,180,60,1);}
+}
 #enemy-area.boss-overflow{overflow:visible;}
 #enemy-area.torch,#enemy-area.wave{background-image:none !important;}/* ::beforeで描画 */
 #enemy-sprite{line-height:1;display:flex;align-items:center;justify-content:center;height:100%;position:relative;z-index:3;}
@@ -134,9 +179,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 }
 /* 背景グラデーション（タイプ別） */
 .card.common  { background:linear-gradient(160deg,#1a1630 0%,#0e0c18 60%,#16122a 100%); border:1.5px solid rgba(138,154,170,.35); }
-.card.rare    { background:linear-gradient(160deg,#0e1a38 0%,#080e20 60%,#0a1430 100%); border:1.5px solid rgba(74,138,255,.5); }
-.card.epic    { background:linear-gradient(160deg,#1a0830 0%,#100618 60%,#180a2e 100%); border:1.5px solid rgba(208,64,255,.55); }
-.card.legendary{ background:linear-gradient(160deg,#2a1400 0%,#180a00 60%,#241200 100%); border:1.5px solid rgba(255,149,0,.6); }
+.card.rare    { background:linear-gradient(160deg,#0e1a38 0%,#080e20 60%,#0a1430 100%); border:1.5px solid rgba(74,138,255,.5); animation:card-glow-rare 2.6s ease-in-out infinite; }
+.card.epic    { background:linear-gradient(160deg,#1a0830 0%,#100618 60%,#180a2e 100%); border:1.5px solid rgba(208,64,255,.55); animation:card-glow-epic 2.2s ease-in-out infinite; }
+.card.legendary{ background:linear-gradient(160deg,#2a1400 0%,#180a00 60%,#241200 100%); border:1.5px solid rgba(255,149,0,.6); animation:card-glow-legendary 1.8s ease-in-out infinite; }
+@keyframes card-glow-rare{0%,100%{box-shadow:0 4px 12px rgba(0,0,0,.6),0 0 4px rgba(74,138,255,.25)}50%{box-shadow:0 4px 12px rgba(0,0,0,.6),0 0 13px rgba(74,138,255,.75)}}
+@keyframes card-glow-epic{0%,100%{box-shadow:0 4px 12px rgba(0,0,0,.6),0 0 5px rgba(208,64,255,.3)}50%{box-shadow:0 4px 12px rgba(0,0,0,.6),0 0 16px rgba(208,64,255,.85)}}
+@keyframes card-glow-legendary{0%,100%{box-shadow:0 4px 12px rgba(0,0,0,.6),0 0 6px rgba(255,149,0,.4)}50%{box-shadow:0 4px 14px rgba(0,0,0,.6),0 0 22px rgba(255,180,60,1)}}
 
 /* 上部カラーバンド */
 .card-band{height:4px;width:100%;flex-shrink:0;}
@@ -300,6 +348,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .dmg-num.enemy-dmg{color:#ff4040;text-shadow:0 0 10px rgba(255,60,60,.8);}
 .dmg-num.player-dmg{color:#ff8800;text-shadow:0 0 10px rgba(255,130,0,.8);}
 .dmg-num.heal{color:#44ff88;text-shadow:0 0 10px rgba(60,255,120,.8);}
+.dmg-num.big-hit{animation:dmg-fly-big 1s cubic-bezier(.34,1.56,.64,1) forwards;text-shadow:0 0 18px currentColor,0 0 6px rgba(255,255,255,.8);}
 #flash-overlay{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0;}
 #flash-overlay.flash-red{animation:flash-red .4s ease-out forwards;}
 #flash-overlay.flash-gold{animation:flash-gold .4s ease-out forwards;}
@@ -307,7 +356,23 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #enemy-area.player-hit{animation:player-hit-shake .35s ease-out;}
 
 @keyframes dmg-fly{0%{opacity:1;transform:translateY(0) scale(1.2)}100%{opacity:0;transform:translateY(-50px) scale(0.8)}}
+@keyframes dmg-fly-big{
+  0%{opacity:0;transform:translateY(6px) scale(2.8)}
+  18%{opacity:1;transform:translateY(-2px) scale(1.4)}
+  32%{transform:translateY(0px) scale(1.15)}
+  45%{transform:translateY(-4px) scale(1.32)}
+  100%{opacity:0;transform:translateY(-55px) scale(1.05)}
+}
 @keyframes flash-red{0%{background:rgba(200,40,40,.35);opacity:1}100%{background:rgba(200,40,40,0);opacity:0}}
+
+/* ボス入場演出 */
+#stage-intro-screen.boss-entrance{animation:boss-intro-shake .5s ease-out;}
+@keyframes boss-intro-shake{0%{transform:translate(0,0)}10%{transform:translate(-9px,4px)}20%{transform:translate(9px,-4px)}30%{transform:translate(-7px,3px)}40%{transform:translate(7px,-3px)}50%{transform:translate(-5px,2px)}60%{transform:translate(5px,-2px)}70%{transform:translate(-3px,1px)}85%{transform:translate(2px,-1px)}100%{transform:translate(0,0)}}
+.stage-intro-boss-label{display:inline-block;animation:boss-text-zoom .55s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes boss-text-zoom{0%{transform:scale(2.3);opacity:0}55%{transform:scale(.92);opacity:1}100%{transform:scale(1);opacity:1}}
+.stage-intro-boss-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(200,30,30,.4) 100%);animation:boss-vignette-pulse 1.6s ease-in-out infinite;pointer-events:none;}
+@keyframes boss-vignette-pulse{0%,100%{opacity:.35}50%{opacity:.7}}
+@keyframes boss-warn-blink{0%,100%{opacity:.4}50%{opacity:1}}
 @keyframes flash-gold{0%{background:rgba(255,200,0,.25);opacity:1}100%{background:rgba(255,200,0,0);opacity:0}}
 @keyframes enemy-hit{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
 @keyframes player-hit-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(8px)}40%{transform:translateX(-8px)}60%{transform:translateX(5px)}80%{transform:translateX(-5px)}}
@@ -531,6 +596,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .card-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);pointer-events:none;animation:ripple-anim .5s ease-out forwards;z-index:99;}
 @keyframes ripple-anim{0%{width:0;height:0;opacity:1;transform:translate(-50%,-50%)}100%{width:80px;height:80px;opacity:0;transform:translate(-50%,-50%)}}
 
+/* カード使用演出（使用確定時にカードが浮き上がって消える） */
+.card-fly-clone{position:fixed;z-index:99999;pointer-events:none;transition:transform .45s ease-out,opacity .45s ease-in;transform-origin:center center;will-change:transform,opacity;filter:drop-shadow(0 4px 14px rgba(0,0,0,.6));}
+
 /* 画面シェイク（地震）*/
 @keyframes screen-quake{0%,100%{transform:translate(0,0)}10%{transform:translate(-6px,3px)}20%{transform:translate(6px,-3px)}30%{transform:translate(-4px,5px)}40%{transform:translate(4px,-5px)}50%{transform:translate(-7px,2px)}60%{transform:translate(7px,-2px)}70%{transform:translate(-3px,4px)}80%{transform:translate(3px,-4px)}90%{transform:translate(-5px,1px)}}
 
@@ -641,6 +709,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 </head>
 <body oncontextmenu="return false;">
 
+
+
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
@@ -663,7 +733,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <div id="title-bg-img" style="position:absolute;inset:0;background-image:url('title.png');background-size:90%;background-position:center;background-repeat:no-repeat;opacity:0.85;pointer-events:none;"></div>
   
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(201,168,76,.12),transparent 65%);pointer-events:none;"></div>
-  
+
+  <div id="btn-save-delete-title" style="position:absolute;top:8px;right:8px;z-index:10;
+    background:rgba(231,76,60,.15);font-family:sans-serif;font-size:11px;color:#e77;font-weight:bold;
+    border:1.5px solid rgba(231,76,60,.55);border-radius:6px;padding:8px 10px;min-width:44px;text-align:center;
+    cursor:pointer;touch-action:manipulation;letter-spacing:1px;white-space:nowrap;box-shadow:0 0 10px rgba(231,76,60,.15);">🗑 セーブ削除</div>
+
+  <div id="btn-mute-toggle" style="position:absolute;top:52px;right:8px;z-index:10;
+    background:rgba(100,160,255,.15);font-family:sans-serif;font-size:11px;color:#7dd4f8;font-weight:bold;
+    border:1.5px solid rgba(100,160,255,.55);border-radius:6px;padding:8px 10px;min-width:44px;text-align:center;
+    cursor:pointer;touch-action:manipulation;letter-spacing:1px;white-space:nowrap;box-shadow:0 0 10px rgba(100,160,255,.15);">🔊 音量ON</div>
+
+  <div id="btn-gamedata-title" style="position:absolute;top:96px;right:8px;z-index:10;
+    background:rgba(120,200,140,.12);font-family:sans-serif;font-size:9px;color:#8fe0a8;
+    border:1px solid rgba(120,200,140,.4);border-radius:6px;padding:6px 8px;min-width:44px;text-align:center;
+    cursor:pointer;touch-action:manipulation;letter-spacing:1px;white-space:nowrap;">📊 ゲームデータ</div>
+
   <div id="admin-pw-box" style="position:absolute;top:10px;left:10px;z-index:10;display:flex;align-items:center;gap:4px;">
     <input id="admin-pw-input" type="password" maxlength="4" placeholder="🔑" style="width:52px;height:28px;background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.3);border-radius:6px;color:#c9a84c;font-size:13px;text-align:center;padding:0 4px;font-family:monospace;outline:none;-webkit-appearance:none;">
     <div id="admin-pw-enter" style="background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:6px;padding:4px 8px;font-size:10px;color:#c9a84c;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">GO</div>
@@ -676,7 +761,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver208</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver239</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -760,7 +845,34 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   </div>
 </div>
 
+<!-- セーブ削除確認ポップアップ（タイトル画面から使うため#appの外側に配置） -->
+<div class="overlay" id="ov-save-delete-confirm" style="gap:8px;padding:14px 12px;position:fixed;z-index:5300;justify-content:center;">
+  <div style="background:linear-gradient(160deg,#1a0a2e,#0a0a1a);border:2px solid rgba(231,76,60,.7);border-radius:14px;padding:20px 24px;max-width:300px;width:88%;font-family:sans-serif;display:flex;flex-direction:column;gap:12px;align-items:center;">
+    <div style="font-size:32px;">🗑</div>
+    <div style="font-family:'Cinzel',serif;font-size:15px;color:#e74c3c;font-weight:bold;text-align:center;">セーブデータを削除しますか？</div>
+    <div style="font-size:12px;color:#ccc;text-align:center;line-height:1.6;">各エリアのクリア記録が消去されます。<br>この操作は取り消せません。</div>
+    <div style="display:flex;gap:12px;width:100%;margin-top:4px;">
+      <button id="sdc-ok" style="flex:1;background:#2a1010;border:2px solid #a44;border-radius:6px;padding:10px;color:#e44;font-size:13px;font-weight:bold;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">削除する</button>
+      <button id="sdc-cancel" style="flex:1;background:#1a1a1a;border:2px solid #666;border-radius:6px;padding:10px;color:#ccc;font-size:13px;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ゲームデータ画面（タイトル画面から使うため#appの外側に配置） -->
+<div class="overlay" id="ov-gamedata" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;">
+  <div class="ov-title" style="font-size:16px;margin-top:0;">📊 ゲームデータ</div>
+  <div style="display:flex;gap:8px;width:100%;">
+    <div id="gamedata-tab-monster" class="ov-btn" style="flex:1;font-size:11px;padding:8px 0;">👹 モンスター図鑑</div>
+    <div id="gamedata-tab-card" class="ov-btn" style="flex:1;font-size:11px;padding:8px 0;">🃏 カード図鑑</div>
+  </div>
+  <div id="gamedata-progress" style="font-size:10px;color:#999;font-family:sans-serif;"></div>
+  <div id="gamedata-content" style="width:100%;overflow-y:auto;max-height:56vh;display:flex;flex-direction:column;gap:8px;"></div>
+  <div class="ov-btn" id="btn-gamedata-close" style="margin-top:4px;">閉じる</div>
+</div>
+
 <div id="app" style="display:none;flex-direction:column;height:100%;">
+
+
   <div id="top-bar">
     
     <div class="top-title" style="position:relative;display:flex;align-items:center;padding:0;overflow:hidden;height:28px;flex-shrink:0;">
@@ -816,6 +928,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
     
     <div id="enemy-area">
+      <div id="area-particles" class="area-particles"><span></span><span></span><span></span><span></span><span></span><span></span></div>
       <!-- エリア効果バッジ（ステージ背景左上に重ねて表示） -->
       <div id="area-effect-box" style="display:none;position:absolute;top:6px;left:6px;z-index:12;width:75px;height:75px;background:#000;border:2px solid #c9a84c;border-radius:7px;padding:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;touch-action:manipulation;overflow:hidden;" onclick="showAreaEffectDetail()" ontouchend="event.preventDefault();showAreaEffectDetail();">
         <div id="area-effect-badge-text" style="font-size:12px;color:#fff;font-weight:bold;font-family:sans-serif;text-align:center;line-height:1.2;"></div>
@@ -871,6 +984,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     </div>
   </div>
   <div id="flash-overlay" style="grid-column:1;grid-row:1/4;position:absolute;inset:0;pointer-events:none;z-index:9998;"></div>
+  <div id="low-hp-vignette"></div>
   <div id="effect-layer" style="position:fixed;inset:0;pointer-events:none;z-index:9999;"></div>
   
   <div id="log-area"></div>
@@ -921,7 +1035,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     
   </div>
   
-  <!-- エリア選択確認ポップアップ -->
   <div id="ov-area-confirm" style="display:none;position:fixed;inset:0;z-index:5200;background:rgba(0,0,0,.75);align-items:center;justify-content:center;">
     <div style="background:linear-gradient(160deg,#1a0a2e,#0a0a1a);border:2px solid rgba(201,168,76,.7);border-radius:14px;padding:20px 24px;max-width:300px;width:88%;font-family:sans-serif;display:flex;flex-direction:column;gap:12px;align-items:center;">
       <div id="acp-icon" style="font-size:40px;"></div>
@@ -953,6 +1066,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <div style="flex:1;">
           <div style="font-family:'Cinzel',serif;font-size:14px;color:#7ec8a0;font-weight:bold;">始まりの洞窟</div>
           <div style="font-size:10px;color:#aaa;font-family:sans-serif;margin-top:3px;">初心者向け ★ 5ステージ</div>
+          <div id="area-clear-badge-0" style="display:none;font-size:9px;color:#ffd700;font-family:sans-serif;margin-top:3px;">🏆 クリア済み</div>
+          <div id="area-progress-0" style="display:none;font-size:9px;color:#8ab8d8;font-family:sans-serif;margin-top:2px;"></div>
         </div>
         <div style="font-size:10px;color:#4aff88;font-family:sans-serif;background:rgba(74,255,136,.1);border:1px solid rgba(74,255,136,.4);border-radius:4px;padding:2px 8px;">プレイ可能</div>
       </div>
@@ -962,6 +1077,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <div style="flex:1;">
           <div style="font-family:'Cinzel',serif;font-size:14px;color:#c9a84c;font-weight:bold;">忘却の遺跡</div>
           <div style="font-size:10px;color:#aaa;font-family:sans-serif;margin-top:3px;">廃墟に眠る古の力を求めて ★★★ 15ステージ</div>
+          <div id="area-clear-badge-1" style="display:none;font-size:9px;color:#ffd700;font-family:sans-serif;margin-top:3px;">🏆 クリア済み</div>
+          <div id="area-progress-1" style="display:none;font-size:9px;color:#8ab8d8;font-family:sans-serif;margin-top:2px;"></div>
         </div>
         <div style="font-size:10px;color:#4aff88;font-family:sans-serif;background:rgba(74,255,136,.1);border:1px solid rgba(74,255,136,.4);border-radius:4px;padding:2px 8px;">プレイ可能</div>
       </div>
@@ -971,6 +1088,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <div style="flex:1;">
           <div style="font-family:'Cinzel',serif;font-size:14px;color:#e07030;font-weight:bold;">炎の神殿</div>
           <div style="font-size:10px;color:#aaa;font-family:sans-serif;margin-top:3px;">灼熱の炎に満ちた神殿 ★★★★ 10ステージ</div>
+          <div id="area-clear-badge-2" style="display:none;font-size:9px;color:#ffd700;font-family:sans-serif;margin-top:3px;">🏆 クリア済み</div>
+          <div id="area-progress-2" style="display:none;font-size:9px;color:#8ab8d8;font-family:sans-serif;margin-top:2px;"></div>
         </div>
         <div style="font-size:10px;color:#e0a030;font-family:sans-serif;background:rgba(224,160,48,.1);border:1px solid rgba(224,160,48,.4);border-radius:4px;padding:2px 8px;">調整中</div>
       </div>
@@ -1263,7 +1382,7 @@ const DB={
   angerShield:  {id:'angerShield', name:'憤怒の盾',   icon:'⚔️', type:'shield',  rarity:'legendary', cost:1, desc:'盾+5 + 次の敵ターンで減った盾分のダメージを与える', shortDesc:"盾+5+次敵T盾減分ダメ", effect:{shield:5,retaliateShield:true}},
   curseSuck:    {id:'curseSuck',   name:'呪詛食い',   icon:'💊', type:'heal',    rarity:'legendary', cost:3, desc:'手札の妨害カードを1枚除外してHP+30（妨害カードがないと使用不可）', shortDesc:"妨害除外:HP+30",  effect:{bougaiExile_heal:30}},
   tenacious:    {id:'tenacious',   name:'驚異の生命力',icon:'💪', type:'heal',   rarity:'legendary', cost:3, desc:'HP50%以上の時のみ使用可。次の敵の攻撃でHPが0になる場合HPが1残り、自ターン開始時HP+10', shortDesc:"HP50%以上/致死無効+次T+10", effect:{deathSave:true,requireHalfHp:true}},
-  exorcise:     {id:'exorcise',    name:'解呪',        icon:'✨', type:'skill',   rarity:'legendary', cost:1, desc:'手札の妨害カードを1枚除外する。手札に妨害カードがない場合は使用不可。', shortDesc:"妨害カード除外",      effect:{bougaiExile_or_draw:true}},
+  exorcise:     {id:'exorcise',    name:'浄化',        icon:'✨', type:'skill',   rarity:'legendary', cost:1, desc:'手札の妨害カードを1枚除外する。手札に妨害カードがない場合は使用不可。', shortDesc:"妨害カード除外",      effect:{bougaiExile_or_draw:true}},
   reconsider:   {id:'reconsider',  name:'考え直し',    icon:'🔁', type:'skill',   rarity:'legendary', cost:1, desc:'カードを好きな枚数選んで捨て、捨てた枚数+1ドロー', shortDesc:"選捨て+捨枚数+1ドロー", effect:{selectDiscardAndDraw:true}},
   curseReturn:  {id:'curseReturn', name:'呪詛返し',    icon:'💀', type:'curse',   rarity:'legendary', cost:3, desc:'手札の妨害カードを1枚除外して敵に30ダメージ（妨害カードがないと使用不可）', shortDesc:"妨害除外:敵30ダメ", effect:{bougaiExile_curse:30}},
   pollutedWorld:{id:'pollutedWorld',name:'汚染世界',   icon:'☠️', type:'curse',   rarity:'legendary', cost:1, desc:'毒5付与 + このターン与える毒が2倍になる', shortDesc:"毒5+このT毒2倍",      effect:{poison:5,doublePoison:true}},
@@ -1438,6 +1557,58 @@ function getRewards(stage){
   return picked;
 }
 
+// ===== セーブ機能（第一段階：エリアクリアフラグ・最高到達ステージ・ミュート設定） =====
+// 将来的にデッキ内容・最高到達ステージ等を追加する場合もこのSAVE_KEYの1エントリにまとめて追記していく想定。
+const SAVE_KEY='dw_save_v1';
+function _defaultSaveData(){
+  return { clearedAreas:[false,false,false], bestStage:[0,0,0], muted:false };
+}
+function loadSaveData(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw) return _defaultSaveData();
+    const d=JSON.parse(raw);
+    if(!d||typeof d!=='object') return _defaultSaveData();
+    if(!Array.isArray(d.clearedAreas)) d.clearedAreas=[false,false,false];
+    if(!Array.isArray(d.bestStage)) d.bestStage=[0,0,0];
+    if(typeof d.muted!=='boolean') d.muted=false;
+    return d;
+  }catch(e){
+    console.warn('[DW] セーブデータの読み込みに失敗しました。初期状態で続行します。',e);
+    return _defaultSaveData();
+  }
+}
+function writeSaveData(){
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify(SAVE));
+    return true;
+  }catch(e){
+    console.warn('[DW] セーブデータの保存に失敗しました（ブラウザ設定・容量等）。',e);
+    return false;
+  }
+}
+function markAreaCleared(areaId){
+  if(areaId==null || areaId<0) return;
+  SAVE.clearedAreas=SAVE.clearedAreas||[];
+  while(SAVE.clearedAreas.length<=areaId) SAVE.clearedAreas.push(false);
+  if(!SAVE.clearedAreas[areaId]){
+    SAVE.clearedAreas[areaId]=true;
+    writeSaveData();
+  }
+}
+// 最高到達ステージを記録（1始まりの人間向け表示値で保存。stageはG.stageと同じ0始まり値を渡す）
+function markBestStage(areaId, stage){
+  if(areaId==null || areaId<0) return;
+  SAVE.bestStage=SAVE.bestStage||[];
+  while(SAVE.bestStage.length<=areaId) SAVE.bestStage.push(0);
+  const reached=stage+1;
+  if(reached>SAVE.bestStage[areaId]){
+    SAVE.bestStage[areaId]=reached;
+    writeSaveData();
+  }
+}
+let SAVE=loadSaveData();
+
 let G={};
 function initGame(){
   G={stage:0,areaId:1,playerHp:30,playerMaxHp:30,shield:0,mana:3,manaMax:10,manaRegen:3,atkBuff:0,nextManaBonus:0,weakenTurns:0,weakenHalf:false,weakenHalfTurns:0,invincibleTurns:0,mirrorActive:false,exileOnBattle:[],tempExiled:[],cardGauge:0,chargeType:null,chargeCount:0,chargeActive:false,nextDmgNull:false,nextTurnHealPending:false,regenTurns:0,regenVal:0,doubleNext:false,doubleMultiplier:1,halfShieldLossTurns:0,
@@ -1459,7 +1630,7 @@ function initGame(){
      gotChargeHelper:false, chargeHelperBonus:0, permAtkCount:0, permAtkBuff2Count:0, turnStartShieldCount:0,
      usedFirstAtkBuff2:false,
      healBuff:0, healBuffCount:0, shieldBuff:0, shieldBuffCount:0,
-     continueRemain:5,
+     continueRemain:5, continueUsed:0,
      nextTurnDrawBonusPending:0,
      swiftUsedThisTurn:false, chainNoSkill:false,
      nextTurnHealBonus:0, comboHealActive:false, usedHighCostThisTurn:false,
@@ -1496,11 +1667,25 @@ function _startStageBattle(){
   clearEffectQueue(); // 前ステージの残留エフェクトロックをリセット
   stopCurseOrbs();
   stopEventBgm();
+  if(!G._cardTestMode) markBestStage(G.areaId, G.stage);
   updateBgm();
+  {
+    const _spReset=document.getElementById('enemy-sprite');
+    if(_spReset){
+      _spReset.style.transition=''; _spReset.style.opacity='';
+    }
+  }
   const _bf=document.getElementById('battlefield');
   const _ha=document.getElementById('hand-area');
   if(_bf) _bf.style.visibility='visible';
   if(_ha) _ha.style.visibility='visible';
+  {
+    const _eaEl=document.getElementById('enemy-area');
+    if(_eaEl){
+      _eaEl.classList.remove('area-cave','area-ruins','area-temple');
+      _eaEl.classList.add(G.areaId===0?'area-cave':G.areaId===1?'area-ruins':'area-temple');
+    }
+  }
   const e=getAreaEnemies()[G.stage];
   G.enemy={...e,curHp:e.hp,patIdx:0};
   G.enemyShield=e.shield||0; G.enemyPoison=0; G.enemyAtkDebuff=0; G.playerPoison=0; G.playerBurn=0; G.heatCount=0; G.igniteCostPenalties=[]; G.ignitedCards={};
@@ -1737,6 +1922,15 @@ function checkEnemyDeath(){
   G.enemy.curHp=0;
   G.phase='block';
   updateUI();
+  // 撃破確定時：多段ヒット演出中(effectRunning)でupdateUIのHPバー更新がスキップされていても、
+  // 撃破した以上は確実にHP0表示にする（表示だけ古いままステージクリアになる不具合の対策）
+  {
+    const _hpBar=document.getElementById('enemy-hp-bar');
+    const _hpNum=document.getElementById('enemy-hp-num');
+    if(_hpBar) _hpBar.style.width='0%';
+    if(_hpNum) _hpNum.textContent='0/'+G.enemy.hp;
+  }
+  recordMonsterDefeated(G.areaId, G.stage, G.enemy);
   if(!G._victoryPending){
     G._victoryPending=true;
     const _wv=()=>{
@@ -2561,15 +2755,15 @@ function playCard(idx, _isChain){
     queueEffect(()=>{spawnDmgNum('-'+d,'enemy-dmg');shakeEnemyArea();flashScreen('flash-gold');sfxDamage();}, 800);
     checkEnemyDeath(); // HP0でもここではreturnしない（後続の効果ブロックを継続処理。最終判定は関数末尾）
   }
-  // 妨害除外 or ドロー（解呪）
+  // 妨害除外 or ドロー（浄化）
   if(ef.bougaiExile_or_draw){
-    // 解呪：状態異常チェック（手札の妨害カードも含む）
+    // 浄化：状態異常チェック（手札の妨害カードも含む）
     const _hasBougaiInHand=G.hand.some(id=>DB[id]&&DB[id].type==='bougai');
     const _hasNeg=(G.playerPoison||0)>0||(G.heavyWoundTurns||0)>0
       ||(G.shieldWeakenTurns||0)>0||(G.quakeTurns||0)>0
       ||G.sealThisTurn||(G.manaRegenPenaltyNext||0)>0
       ||_hasBougaiInHand;
-    if(!_hasNeg){addLog('✨ 解呪: 状態異常がないため使用不可！','sys');return;}
+    if(!_hasNeg){addLog('✨ 浄化: 状態異常がないため使用不可！','sys');return;}
     const bIdx=G.hand.findIndex(id=>DB[id]&&DB[id].type==='bougai');
     if(bIdx>=0){const bid=G.hand.splice(bIdx,1)[0];msgs.push('妨害「'+DB[bid].name+'」除外');}
     else{msgs.push('ドロー1');queueEffect(()=>{flashDrawCard(1);setTimeout(()=>{drawCards(1);renderHand();},500);}, 800);}
@@ -3349,7 +3543,7 @@ function dealToPlayer(dmg,lbl){
 // 妨害カード追加ヘルパー：デッキとdrawPileの両方に追加する
 function addBougaiCards(...ids){
   ids.forEach(id=>{
-    G.deck.push(id);
+    addCardToDeck(id);
     const insertPos=Math.floor(Math.random()*(G.drawPile.length+1));
     G.drawPile.splice(insertPos,0,id);
   });
@@ -3600,7 +3794,8 @@ function victory(){
 function _doVictoryReward(){
   stopBgm();
   if(G.stage>=getAreaEnemies().length-1){
-    // ===== ステージ15クリア：豪華エンディング演出 =====
+    // ===== 最終ステージクリア：セーブ（エリアクリアフラグ）→豪華エンディング演出 =====
+    if(!G._cardTestMode) markAreaCleared(G.areaId);
     _showGrandEnding();
     return;
   }
@@ -3611,7 +3806,7 @@ function _doVictoryReward(){
       pool.forEach(cid=>{
     const c=DB[cid];if(!c)return;
     const d=document.createElement('div');
-    d.className='card '+c.rarity+' playable';
+    d.className='card '+c.rarity+' playable'+(c.rarity==='legendary'?' legendary-get-flash':'');
     const rFrameImg=FRAME_IMGS[c.rarity]||'';
     if(rFrameImg){d.style.backgroundImage='url('+rFrameImg+')';d.style.backgroundSize='100% 100%';}
     const rCorner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★'}[c.rarity]||'◆';
@@ -3620,14 +3815,14 @@ function _doVictoryReward(){
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+rCorner+'</div>'+
       '<div class="card-corner br">'+rCorner+'</div>';
     const doAddDeck=()=>{
-      G.deck.push(cid);
+      addCardToDeck(cid);
       sfxPickCard();
       addLog('📖「'+c.name+'」をデッキに追加！','sys');
       selectedRewardEl=null;
@@ -3757,7 +3952,7 @@ function applyExile(){
   // tempExiled（一時除外）はデッキに戻す
   if(G.tempExiled&&G.tempExiled.length>0){
     G.tempExiled.forEach(cid=>{
-      G.deck.push(cid);
+      addCardToDeck(cid);
       addLog('⚗️「'+DB[cid].name+'」がデッキに戻った','sys');
     });
     G.tempExiled=[];
@@ -4284,6 +4479,9 @@ const AREA_DATA = [
     },
   },
 ];
+// AREA_DATA定義後に配列長を揃える（エリア追加時に配列長が足りない場合は初期値で埋める）
+while(SAVE.clearedAreas.length<AREA_DATA.length) SAVE.clearedAreas.push(false);
+while(SAVE.bestStage.length<AREA_DATA.length) SAVE.bestStage.push(0);
 
 function showAreaSelect(){
   showOv('ov-area-select');
@@ -4294,6 +4492,21 @@ function showAreaSelect(){
       const go=()=>{ showAreaConfirm(idx); };
       btn.onclick=go;
       btn.ontouchend=(e)=>{e.preventDefault();go();};
+    }
+    const badge=document.getElementById('area-clear-badge-'+idx);
+    const cleared=!!(SAVE.clearedAreas&&SAVE.clearedAreas[idx]);
+    if(badge){
+      badge.style.display=cleared?'block':'none';
+    }
+    const progress=document.getElementById('area-progress-'+idx);
+    if(progress){
+      const best=(SAVE.bestStage&&SAVE.bestStage[idx])||0;
+      if(!cleared && best>0){
+        progress.textContent='最高到達: ステージ'+best;
+        progress.style.display='block';
+      } else {
+        progress.style.display='none';
+      }
     }
   });
 }
@@ -4434,9 +4647,9 @@ function showSpringEvent(){
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+(n>1?' ×'+n:'')+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+(n>1?' ×'+n:'')+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
       '<div class="card-corner br">'+corner+'</div>';
@@ -4504,16 +4717,16 @@ function showSpringRewards(rarity, list, rewardArea, rewardList){
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
       '<div class="card-corner br">'+corner+'</div>';
 
     const pick=(ev)=>{
       if(ev&&ev.type==='touchend') ev.preventDefault();
-      G.deck.push(cid);
+      addCardToDeck(cid);
       addLog('💧「'+c.name+'」を獲得！','sys');
       hideOv('ov-spring');
       afterEventNext();
@@ -4758,9 +4971,9 @@ function showBanishEvent(){
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+(n>1?' ×'+n:'')+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+(n>1?' ×'+n:'')+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
       '<div class="card-corner br">'+corner+'</div>';
@@ -4897,6 +5110,7 @@ function _showResultOver(enemyName, causeText){
         const over = document.getElementById('_result-over');
         if(over&&over.parentNode) over.parentNode.removeChild(over);
         G.continueRemain--;
+        G.continueUsed=(G.continueUsed||0)+1;
         const doRevive=()=>{
           G.playerHp=G.playerMaxHp;
           G.phase='player';
@@ -5109,6 +5323,13 @@ function updateUI(){
   }
   document.getElementById('player-hp-bar').style.width=Math.max(0,G.playerHp/G.playerMaxHp*100)+'%';
   document.getElementById('player-hp-num').textContent=G.playerHp+'/'+G.playerMaxHp;
+  {
+    const _lowHp=document.getElementById('low-hp-vignette');
+    if(_lowHp){
+      const _hpRatio=G.playerMaxHp>0?G.playerHp/G.playerMaxHp:1;
+      _lowHp.classList.toggle('active', _hpRatio>0 && _hpRatio<=0.25);
+    }
+  }
   checkHpBlink();
   // 捨て札カウント更新
   const dc=document.getElementById('discard-count');
@@ -5200,9 +5421,9 @@ function showHandSelectOverlay(title, onSelect){
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
       '<div class="card-corner br">'+corner+'</div>';
@@ -5243,9 +5464,9 @@ function showDiscardSelectOverlay(title, onSelect){
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
       '<div class="card-corner br">'+corner+'</div>';
@@ -5397,9 +5618,7 @@ function showStatusDetail(target){
     if(G.shield>0) lines.push('🛡️ シールド '+G.shield+'\nダメージを吸収。ターン開始時30%減少');
     if(G.playerPoison>0) lines.push('☠️ 毒 '+G.playerPoison+'T\nターン開始時に毒カウント分ダメージ');
     if(G.playerBurn>0) lines.push('🔥 炎上 '+G.playerBurn+'層\nターン開始時に固定2ダメージ。層数は毎ターン1減衰（最大10層）');
-    if(G.permAtkBonus>0) lines.push('⚔️ 常時攻撃力 +'+G.permAtkBonus+'\n全攻撃に常時加算される');
-    if(G.atkBuff>G.permAtkBonus) lines.push('⚔️ 攻撃力バフ +'+G.atkBuff+'\nこのターン中の攻撃力ボーナス');
-    if(G.permAtkBuff2>0) lines.push('⚡ 最初の一撃 +'+G.permAtkBuff2+(G.usedFirstAtkBuff2?' (使用済)':'')+'\n各ターン最初の攻撃に加算');
+    if(G.atkBuff>(G.permAtkBonus||0)) lines.push('⚔️ 攻撃力バフ +'+G.atkBuff+'\nこのターン中の攻撃力ボーナス');
     if(G.regenTurns>0) lines.push('💚 聖域再生 '+G.regenTurns+'T\nターン終了時HP+'+G.regenVal+'回復');
     if(G.freeNextCard) lines.push('🎭 踏み倒し発動中\n次のカードのコストが0になる');
     if(G.invincibleTurns>0) lines.push('🌟 無敵 '+G.invincibleTurns+'T\n全てのダメージが無効');
@@ -5500,6 +5719,37 @@ function showCurseInfo(){
   appendToApp(popup);
 }
 
+// カード飛翔演出：使用確定したカードが対象へ飛んでいく
+function playCardFlyAnimation(sourceEl, cardType){
+  try{
+    if(!sourceEl) return;
+    const startRect=sourceEl.getBoundingClientRect();
+    const isOffensive=(cardType==='attack'||cardType==='curse'||cardType==='bougai');
+    const clone=sourceEl.cloneNode(true);
+    clone.className=sourceEl.className+' card-fly-clone';
+    clone.style.position='fixed';
+    clone.style.left=startRect.left+'px';
+    clone.style.top=startRect.top+'px';
+    clone.style.width=startRect.width+'px';
+    clone.style.height=startRect.height+'px';
+    clone.style.margin='0';
+    clone.style.transform='translateY(0) scale(1)';
+    clone.style.opacity='1';
+    document.body.appendChild(clone);
+    // 開始状態が確実に1フレーム描画されてから終了状態へ遷移させる（二重rAFで安全に）
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        clone.style.transform='translateY(-55px) scale(1.06)';
+        clone.style.opacity='0';
+      });
+    });
+    setTimeout(()=>{
+      if(isOffensive){ shakeEnemyArea(); }
+      if(clone.parentNode) clone.parentNode.removeChild(clone);
+    },480);
+  }catch(err){ /* 演出失敗時はゲーム進行に影響させない */ }
+}
+
 function cardIconHtml(c){
   const imgId=c._baseId||c.id;
   return '<div class="card-icon-wrap">'
@@ -5507,6 +5757,16 @@ function cardIconHtml(c){
     +'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\';">'
     +'<div class="card-icon" style="display:none;">'+c.icon+'</div>'
     +'</div>';
+}
+// カード名：基準10.5px、7文字目から自動縮小（最小7.5px）
+function _cardNameSize(name){
+  const n=(name||'').length;
+  return n<=6?10.5:Math.max(7.5,10.5-(n-6)*0.5);
+}
+// カード説明文：基準9px、15文字目から自動縮小（最小6.5px）
+function _cardDescSize(text){
+  const n=(text||'').length;
+  return n<=14?9:Math.max(6.5,9-(n-14)*0.25);
 }
 
 function renderHand(){
@@ -5558,7 +5818,7 @@ function renderHand(){
     const ef=c.effect||{};
     const needsBougai=ef.bougaiExile_atk||ef.bougaiExile_shield||ef.bougaiExile_heal||ef.bougaiExile_curse;
     const isBougaiLocked=needsBougai&&!hasBougaiInHand;
-    // 解呪：状態異常を受けていないかつ手札に妨害カードもない場合は使用不可
+    // 浄化：状態異常を受けていないかつ手札に妨害カードもない場合は使用不可
     const hasBougaiInHand = G.hand.some(id=>DB[id]&&DB[id].type==='bougai');
     const _exorciseHasTarget=hasBougaiInHand||(G.playerPoison||0)>0||(G.playerBurn||0)>0||(G.heavyWoundTurns||0)>0||(G.shieldWeakenTurns||0)>0||(G.quakeTurns||0)>0||G.sealThisTurn||(G.manaRegenPenaltyNext||0)>0;
     const isExorciseLocked = (c.id==='exorcise'||c._baseId==='exorcise') && !_exorciseHasTarget;
@@ -5852,9 +6112,9 @@ function renderHand(){
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+(isHakiZero?'<span style="color:#f0c040">0</span>':isFreePassTarget?'<span class="freepass-cost-blink" data-orig="'+reducedCost+'">0</span>':ignitePenalty>0?'<span style="color:#e74c3c;font-weight:bold;">'+reducedCost+'</span>':reducedCost)+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+displayDesc+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(displayDesc)+'px;">'+displayDesc+'</div>'+
         '<div class="rarity-dot '+c.rarity+'">'+RL[c.rarity]+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
@@ -5974,6 +6234,7 @@ function showCardUsePopup(c,idx,canUse){
       e.stopPropagation();
       if(e.type==='touchend') e.preventDefault();
       sfxConfirm();
+      playCardFlyAnimation(cardDiv, c.type);
       if(popup.parentNode) popup.parentNode.removeChild(popup);
       selectedCardIdx=-1;
       setTimeout(()=>playCard(idx),500);
@@ -6065,9 +6326,9 @@ function showDiscardPile(){
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+(n>1?' ×'+n:'')+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+(n>1?' ×'+n:'')+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
       '<div class="card-corner br">'+corner+'</div>';
@@ -6113,16 +6374,16 @@ function showDuplicateEvent(){
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+(n>1?' ×'+n:'')+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+(n>1?' ×'+n:'')+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
       '<div class="card-corner br">'+corner+'</div>';
     const pick=(ev)=>{
       if(ev&&ev.type==='touchend') ev.preventDefault();
       showCardDetailWithConfirm(c, ()=>{
-        G.deck.push(id);
+        addCardToDeck(id);
         addLog('🪄「'+c.name+'」を複製！デッキに追加','sys');
         hideOv('ov-duplicate');
         afterEventNext();
@@ -6166,7 +6427,7 @@ function showAltarBeforeEnding(nextFn){
   pool.forEach(cid=>{
     const c=DB[cid];if(!c)return;
     const d=document.createElement('div');
-    d.className='card legendary playable';
+    d.className='card legendary playable legendary-get-flash';
     const fImg=FRAME_IMGS['legendary']||'';
     if(fImg){d.style.backgroundImage='url('+fImg+')';d.style.backgroundSize='100% 100%';}
     d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
@@ -6174,9 +6435,9 @@ function showAltarBeforeEnding(nextFn){
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost legendary">'+c.cost+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
       '</div>'+
       '<div class="card-corner tl">★</div><div class="card-corner br">★</div>';
     const pick=(ev)=>{
@@ -6196,7 +6457,7 @@ function showAltarBeforeEnding(nextFn){
     if(G.playerHp<=50){addLog('💢 HPが足りない！（50以上必要）','sys');return;}
     _altarHandled=true;
     G.playerHp-=50;
-    G.deck.push(chosenId);
+    addCardToDeck(chosenId);
     addLog('🔮 祭壇: HP-50 → 「'+DB[chosenId].name+'」獲得！','sys');
     spawnDmgNum('-50','player-dmg'); updateUI();
     hideOv('ov-altar');
@@ -6315,6 +6576,7 @@ function _showResultClear(){
       '<div style="font-size:11px;color:#78b0e0;margin-bottom:3px;">🛡️ 受けたダメージ: '+(G.totalDmgTaken||0)+'</div>'+
       '<div style="font-size:11px;color:#78e0a0;margin-bottom:3px;">🃏 使用カード枚数: '+(G.totalCardsUsed||0)+'</div>'+
       '<div style="font-size:11px;color:#e0c878;">⏱️ 総ターン数: '+(G.totalTurns||0)+'</div>'+
+      '<div style="font-size:11px;color:#e0a878;margin-top:3px;">📺 コンテニュー使用回数: '+(G.continueUsed||0)+'</div>'+
     '</div>';
 
   // スクロール領域（中段）
@@ -6807,7 +7069,7 @@ function spawnDmgNum(txt,type){
   d.textContent=txt;
   // ダメージ量によるサイズ変化
   const num=parseInt(txt.replace(/[^0-9]/g,''))||0;
-  if(num>=20) d.style.fontSize='34px';
+  if(num>=20){ d.style.fontSize='34px'; d.className+=' big-hit'; }
   else if(num>=10) d.style.fontSize='26px';
   else d.style.fontSize='20px';
   let x,y;
@@ -6834,7 +7096,7 @@ function spawnDmgNum(txt,type){
   }
   d.style.left=x+'px'; d.style.top=y+'px';
   el.appendChild(d);
-  setTimeout(()=>d.remove(),950);
+  setTimeout(()=>d.remove(),1050);
 }
 function flashScreen(type){
   const el=document.getElementById('flash-overlay');
@@ -6948,7 +7210,45 @@ function hideOv(id){
     }, 4000);
   }
 }
-function bind(id,fn){const el=document.getElementById(id);if(!el)return;el.addEventListener('click',fn);el.addEventListener('touchend',e=>{e.preventDefault();fn();});}
+// ===== 図鑑用 永続データ（localStorage） =====
+const ZUKAN_KEY='dw_zukan_v1';
+function loadZukanData(){
+  try{
+    const raw=localStorage.getItem(ZUKAN_KEY);
+    if(!raw) return {defeated:{}, cards:{}};
+    const d=JSON.parse(raw);
+    return {defeated:d.defeated||{}, cards:d.cards||{}};
+  }catch(e){ return {defeated:{}, cards:{}}; }
+}
+function saveZukanData(){
+  try{ localStorage.setItem(ZUKAN_KEY, JSON.stringify(ZUKAN)); }catch(e){ /* 保存失敗時は無視 */ }
+}
+let ZUKAN = loadZukanData();
+function recordMonsterDefeated(areaId, stageIdx, enemyData){
+  if(!enemyData) return;
+  const key=areaId+'_'+stageIdx;
+  if(!ZUKAN.defeated[key]){
+    ZUKAN.defeated[key]={
+      name:enemyData.name, icon:enemyData.icon, hp:enemyData.hp, atk:enemyData.atk,
+      shield:enemyData.shield||0, boss:!!enemyData.boss, img:enemyData.img||'',
+      filter:enemyData.filter||'', areaId:areaId, stageIdx:stageIdx
+    };
+    saveZukanData();
+  }
+}
+function recordCardAcquired(cardId){
+  if(!cardId || ZUKAN.cards[cardId]) return;
+  ZUKAN.cards[cardId]=true;
+  saveZukanData();
+}
+function addCardToDeck(id){
+  G.deck.push(id);
+  recordCardAcquired(id);
+}
+
+function bind(id,fn){const el=document.getElementById(id);if(!el)return;let _t=0;const guarded=(e)=>{if(e&&e.stopPropagation)e.stopPropagation();const now=Date.now();if(now-_t<300)return;_t=now;fn();};el.addEventListener('click',guarded);el.addEventListener('touchend',e=>{e.preventDefault();guarded(e);});}
+// タップ/クリックの二重発火を防ぐ共通ラッパー（addEventListenerで click+touchend を両方登録する箇所向け）
+function bindSafe(el,fn){if(!el)return;let _handled=false;const guarded=(e)=>{if(e&&e.type==='touchend')e.preventDefault();if(_handled)return;_handled=true;fn(e);};el.addEventListener('click',guarded);el.addEventListener('touchend',guarded);return ()=>{_handled=false;};}
 
 // フリック（スクロール）とタップを区別するユーティリティ
 // touchstartでタッチ位置を記録し、touchendで移動距離が閾値以下ならタップと判定
@@ -7063,6 +7363,17 @@ function getAudioCtx(){
 }
 
 // BGMシステム
+// 音声ミュート設定（SAVEに永続化。設定変更のたびに再生中の音声へも即反映）
+function isMuted(){ return !!(SAVE&&SAVE.muted); }
+function _applyMuteToActiveAudio(){
+  [_opAudio,_bgmAudio,_eventAudio].forEach(a=>{ if(a) a.muted=isMuted(); });
+}
+function setMuted(v){
+  SAVE.muted=!!v;
+  writeSaveData();
+  _applyMuteToActiveAudio();
+}
+
 let _bgmAudio=null;
 let _currentBgm=null;
 let _opAudio=null; // OP用（タイトル画面専用）
@@ -7073,6 +7384,7 @@ function playOpBgm(){
     _opAudio=new Audio('op.mp3');
     _opAudio.loop=true;
     _opAudio.volume=0.85;
+    _opAudio.muted=isMuted();
     _opAudio.play().catch(()=>{});
   }catch(e){}
 }
@@ -7091,6 +7403,7 @@ function playEventBgm(){
     _eventAudio=new Audio('event.mp3');
     _eventAudio.loop=true;
     _eventAudio.volume=0.85;
+    _eventAudio.muted=isMuted();
     _eventAudio.play().catch(()=>{});
   }catch(e){}
 }
@@ -7110,6 +7423,7 @@ function playBgm(file){
     _bgmAudio=new Audio(file);
     _bgmAudio.loop=true;
     _bgmAudio.volume=0.85;
+    _bgmAudio.muted=isMuted();
     _bgmAudio.play().catch(()=>{});
   }catch(e){}
 }
@@ -7140,6 +7454,7 @@ function updateBgm(){
   }
 }
 function playBeep(freq=440,type='square',dur=0.08,vol=0.12,delay=0){
+  if(isMuted()) return;
   const ctx=getAudioCtx(); if(!ctx)return;
   try{
     const o=ctx.createOscillator(),g=ctx.createGain();
@@ -7169,6 +7484,7 @@ const SE_FILES={
 };
 const _seCache={}; // ファイル存在キャッシュ（null=未確認, true=あり, false=なし）
 function playSE(key, fallback){
+  if(isMuted()) return;
   const file=SE_FILES[key];
   if(!file){fallback&&fallback();return;}
   if(_seCache[key]===false){fallback&&fallback();return;}
@@ -7461,9 +7777,9 @@ function executeChargeEffect(){
           '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪'}[c.type]||'')+'</div>'+
           '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
           cardIconHtml(c)+
-          '<div class="card-name">'+c.name+'</div>'+
+          '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
           '<div class="card-divider"></div>'+
-          '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+          '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
         '</div>'+
         '<div class="card-corner tl">'+corner+'</div>'+
         '<div class="card-corner br">'+corner+'</div>';
@@ -7980,9 +8296,9 @@ bind('btn-deck-view',()=>{
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
-        '<div class="card-name">'+c.name+(n>1?' ×'+n:'')+'</div>'+
+        '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+(n>1?' ×'+n:'')+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
+        '<div class="card-desc" style="font-size:'+_cardDescSize(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'px;">'+(c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':''))+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
       '<div class="card-corner br">'+corner+'</div>';
@@ -8168,7 +8484,7 @@ let _gameStarting=false;
 function startGame(){
   if(_gameStarting) return;
   // ロゴ演出中（opacity<1）はタップを無視
-  if(parseFloat(logoScreen.style.opacity||'0') < 0.9) return;
+  if(parseFloat(logoScreen.style.opacity||'0') < 0.15) return;
   _gameStarting=true;
   hideOv('ov-charge-select'); // 念のため非表示
   sfxConfirm();
@@ -8236,6 +8552,9 @@ setTimeout(()=>{
 function _onTapStart_touch(e){
   if(e.target.id==='btn-rules-title'||e.target.closest('#btn-rules-title')) return;
   if(e.target.id==='btn-tutorial-title'||e.target.closest('#btn-tutorial-title')) return;
+  if(e.target.id==='btn-gamedata-title'||e.target.closest('#btn-gamedata-title')) return;
+  if(e.target.id==='btn-save-delete-title'||e.target.closest('#btn-save-delete-title')) return;
+  if(e.target.id==='btn-mute-toggle'||e.target.closest('#btn-mute-toggle')) return;
   if(!e.target.closest('#tap-start-zone')) return;
   e.preventDefault();
   _unregisterStartListeners();
@@ -8244,6 +8563,9 @@ function _onTapStart_touch(e){
 function _onTapStart_click(e){
   if(e.target.id==='btn-rules-title'||e.target.closest('#btn-rules-title')) return;
   if(e.target.id==='btn-tutorial-title'||e.target.closest('#btn-tutorial-title')) return;
+  if(e.target.id==='btn-gamedata-title'||e.target.closest('#btn-gamedata-title')) return;
+  if(e.target.id==='btn-save-delete-title'||e.target.closest('#btn-save-delete-title')) return;
+  if(e.target.id==='btn-mute-toggle'||e.target.closest('#btn-mute-toggle')) return;
   if(!e.target.closest('#tap-start-zone')) return;
   _unregisterStartListeners();
   startGame();
@@ -8256,6 +8578,7 @@ function _registerStartListeners(){
   _unregisterStartListeners();
   logoScreen.addEventListener('touchend',_onTapStart_touch);
   logoScreen.addEventListener('click',_onTapStart_click);
+  if(typeof _bindTitleExtraButtons==='function') _bindTitleExtraButtons();
 }
 
 _registerStartListeners();
@@ -8287,6 +8610,309 @@ if(tutorialBtn){
   tutorialBtn.addEventListener('touchend',e=>{ e.stopPropagation(); e.preventDefault(); startTutorial(); });
 }
 
+// タイトル画面の追加ボタン（ゲームデータ・セーブ削除・音量）
+// property代入(onclick/ontouchend)方式にすることで、_registerStartListeners()から
+// 何度呼ばれても重複登録されない（安全に再紐付けできる）ようにしている。
+function _updateMuteBtnLabel(){
+  const btn=document.getElementById('btn-mute-toggle');
+  if(!btn) return;
+  btn.textContent=isMuted()?'🔇 音量OFF':'🔊 音量ON';
+}
+function _bindTitleExtraButtons(){
+  const gamedataBtn=document.getElementById('btn-gamedata-title');
+  if(gamedataBtn){
+    gamedataBtn.onclick=(e)=>{ e.stopPropagation(); showGameDataScreen(); };
+    gamedataBtn.ontouchend=(e)=>{ e.stopPropagation(); e.preventDefault(); showGameDataScreen(); };
+  }
+  const deleteBtn=document.getElementById('btn-save-delete-title');
+  if(deleteBtn){
+    const doOpenDelete=(e)=>{ e.stopPropagation(); if(e.type==='touchend')e.preventDefault(); showOv('ov-save-delete-confirm'); };
+    deleteBtn.onclick=doOpenDelete;
+    deleteBtn.ontouchend=doOpenDelete;
+  }
+  const sdcCancel=document.getElementById('sdc-cancel');
+  if(sdcCancel){
+    const doCancel=(e)=>{ e.stopPropagation(); if(e.type==='touchend')e.preventDefault(); hideOv('ov-save-delete-confirm'); };
+    sdcCancel.onclick=doCancel;
+    sdcCancel.ontouchend=doCancel;
+  }
+  const sdcOk=document.getElementById('sdc-ok');
+  if(sdcOk){
+    const doOk=(e)=>{
+      e.stopPropagation(); if(e.type==='touchend')e.preventDefault();
+      const _keepMuted=SAVE&&SAVE.muted; // 音量設定はプレイ記録と別扱いなので保持する
+      try{ localStorage.removeItem(SAVE_KEY); }catch(err){ console.warn('[DW] セーブデータの削除に失敗しました。',err); }
+      SAVE=_defaultSaveData();
+      SAVE.muted=!!_keepMuted;
+      writeSaveData();
+      hideOv('ov-save-delete-confirm');
+    };
+    sdcOk.onclick=doOk;
+    sdcOk.ontouchend=doOk;
+  }
+  const muteBtn=document.getElementById('btn-mute-toggle');
+  if(muteBtn){
+    const doToggle=(e)=>{ e.stopPropagation(); if(e.type==='touchend')e.preventDefault(); setMuted(!isMuted()); _updateMuteBtnLabel(); };
+    muteBtn.onclick=doToggle;
+    muteBtn.ontouchend=doToggle;
+  }
+  _updateMuteBtnLabel();
+}
+_bindTitleExtraButtons();
+
+// ===== ゲームデータ画面（モンスター図鑑・カード図鑑） =====
+let _gamedataTab='monster';
+function showGameDataScreen(){
+  _gamedataTab='monster';
+  renderGameDataContent();
+  // ボタン類はHTMLがメインスクリプトより後方にあるため、開くたびに紐付ける
+  const tabM=document.getElementById('gamedata-tab-monster');
+  const tabC=document.getElementById('gamedata-tab-card');
+  const closeBtn=document.getElementById('btn-gamedata-close');
+  if(tabM){
+    tabM.onclick=(e)=>{e.stopPropagation();_gamedataTab='monster';renderGameDataContent();};
+    tabM.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();_gamedataTab='monster';renderGameDataContent();};
+  }
+  if(tabC){
+    tabC.onclick=(e)=>{e.stopPropagation();_gamedataTab='card';renderGameDataContent();};
+    tabC.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();_gamedataTab='card';renderGameDataContent();};
+  }
+  if(closeBtn){
+    closeBtn.onclick=(e)=>{e.stopPropagation();hideOv('ov-gamedata');};
+    closeBtn.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();hideOv('ov-gamedata');};
+  }
+  showOv('ov-gamedata');
+}
+function renderGameDataContent(){
+  const tabM=document.getElementById('gamedata-tab-monster');
+  const tabC=document.getElementById('gamedata-tab-card');
+  if(tabM) tabM.style.opacity=(_gamedataTab==='monster')?'1':'.5';
+  if(tabC) tabC.style.opacity=(_gamedataTab==='card')?'1':'.5';
+  const content=document.getElementById('gamedata-content');
+  const progress=document.getElementById('gamedata-progress');
+  if(!content) return;
+  if(_gamedataTab==='monster') renderMonsterEncyclopedia(content, progress);
+  else renderCardEncyclopedia(content, progress);
+}
+// 敵の行動パターンID→表示名・説明の対応表
+const ACTION_DESC={
+  atk:        {name:'通常攻撃', desc:'通常の攻撃。'},
+  big:        {name:'大攻撃💥', desc:'通常の2倍のダメージを与える強力な攻撃。'},
+  poisonatk:  {name:'毒攻撃☠️', desc:'攻撃に加え、毒を2ターン分付与する（無敵状態では無効化される）。'},
+  drain:      {name:'吸収攻撃🩸', desc:'攻撃に加え、自身の最大HPの10%を吸収して回復する。'},
+  def:        {name:'防御🛡️', desc:'シールドを+8する。'},
+  bigdef:     {name:'大防御🛡️🛡️', desc:'シールドを+16する。'},
+  superbigdef:{name:'超防御🛡️🛡️🛡️', desc:'シールドを+24する強力な防御。'},
+  curse:      {name:'呪い💀', desc:'シールドを無視する直接ダメージを与える。'},
+  bigcurse:   {name:'大呪い💀', desc:'シールドを無視する直接ダメージ（通常の2倍）を与える。'},
+  heal:       {name:'回復💚', desc:'自身の最大HPの10%を回復する。'},
+  bigheal:    {name:'大回復💚💚', desc:'自身の最大HPの20%を回復する。'},
+  summon:     {name:'召喚🌑', desc:'シールド+15、さらに攻撃15のダメージを与える。'},
+  quake:      {name:'地響き🌍', desc:'攻撃に加え、次のプレイヤーターン中はコスト1のカードが使用不可になる。'},
+  seal:       {name:'封印🔒', desc:'攻撃に加え、次のターン中は最もコストの高いカードが使用不可になる。'},
+  poisonfang: {name:'猛毒牙☠️', desc:'攻撃に加え、デッキに「猛毒牙D」を2枚追加する。'},
+  burn:       {name:'火傷🔥', desc:'攻撃に加え、デッキに「火傷D」を3枚追加する。'},
+  ignite:     {name:'炎上🔥', desc:'攻撃に加え、次のターンにドローするカード1枚のコストが+1される。'},
+  bigignite:  {name:'大炎上🔥', desc:'攻撃に加え、次のターンにドローするカード1枚のコストが+2される。'},
+  superignite:{name:'超炎上🔥', desc:'攻撃に加え、次のターンにドローするカード2枚のコストが+2される。'},
+  weaken_e:   {name:'衰弱💀', desc:'攻撃に加え、2ターンの間シールドの効果が半減する。'},
+  judgment:   {name:'裁き⚖️', desc:'攻撃に加え、次のターン開始時のマナ回復が-1される。'},
+  heavywound: {name:'重傷💔', desc:'攻撃に加え、3ターンの間回復カードの効果が半減する。'},
+  soulcrush:  {name:'魂砕き💀', desc:'攻撃に加え、デッキに「魂砕きD」を1枚追加する。'},
+  curse_bind: {name:'呪縛⛓️', desc:'攻撃に加え、次のターン開始時のマナ回復が-2される。'},
+  despair:    {name:'絶望😈', desc:'攻撃に加え、デッキに「足枷D」を3枚追加する。'},
+  enervate:   {name:'脱力😩', desc:'攻撃に加え、デッキに「脱力D」を2枚追加する。'},
+  reflect_e:  {name:'反射🔄', desc:'攻撃に加え、次にプレイヤーが受けるダメージが反射される状態になる。'}
+};
+function showMonsterDetailPopup(rec, pattern){
+  const popup=document.createElement('div');
+  popup.style.cssText='position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:20px 0;';
+  const box=document.createElement('div');
+  box.style.cssText='background:linear-gradient(160deg,#1a1020,#0a0a1a);border:2px solid rgba(201,168,76,.6);border-radius:14px;max-width:320px;width:88%;max-height:80vh;font-family:sans-serif;display:flex;flex-direction:column;overflow:hidden;';
+
+  // ヘッダー（固定・スクロールしない）
+  const header=document.createElement('div');
+  header.style.cssText='padding:18px 20px 0;flex-shrink:0;text-align:center;';
+  const _imgHtml=rec.img
+    ?'<div style="width:64px;height:64px;margin:0 auto;position:relative;">'
+      +'<img src="'+rec.img+'" style="width:100%;height:100%;object-fit:contain;border-radius:6px;'+(rec.filter?'filter:'+rec.filter+';':'')+'" '
+      +'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\';">'
+      +'<div style="display:none;font-size:40px;">'+(rec.icon||'❓')+'</div>'
+    +'</div>'
+    :'<div style="font-size:40px;">'+(rec.icon||'❓')+'</div>';
+  header.innerHTML=_imgHtml
+    +'<div style="font-family:\'Cinzel\',serif;font-size:16px;color:#f0d47a;font-weight:bold;margin-top:4px;">'+(rec.boss?'👑 ':'')+rec.name+'</div>'
+    +'<div style="font-size:11px;color:#999;margin-top:4px;">HP '+rec.hp+' ／ 攻撃力 '+rec.atk+(rec.shield?' ／ シールド '+rec.shield:'')+'</div>'
+    +'<div style="height:1px;background:rgba(201,168,76,.3);margin:12px 0 8px;"></div>'
+    +'<div style="font-family:\'Cinzel\',serif;font-size:12px;color:#c9a84c;text-align:left;">行動パターン'+(pattern&&pattern.length>2?'（'+pattern.length+'種・下にスクロール↓）':'')+'</div>';
+  box.appendChild(header);
+
+  // 行動パターン一覧（ここだけスクロール可能）
+  const scrollArea=document.createElement('div');
+  scrollArea.style.cssText='overflow-y:auto;flex:1;min-height:0;padding:6px 20px 4px;';
+  let html='';
+  if(pattern && pattern.length>0){
+    pattern.forEach((actId,i)=>{
+      const ad=ACTION_DESC[actId]||{name:actId,desc:'（説明未登録の行動）'};
+      html+='<div style="margin-bottom:8px;">'
+        +'<div style="font-size:11px;color:#eee;font-weight:bold;">'+(i+1)+'. '+ad.name+'</div>'
+        +'<div style="font-size:10px;color:#aaa;line-height:1.5;margin-top:2px;">'+ad.desc+'</div>'
+        +'</div>';
+    });
+  } else {
+    html+='<div style="font-size:11px;color:#777;">行動パターン情報がありません。</div>';
+  }
+  scrollArea.innerHTML=html;
+  box.appendChild(scrollArea);
+
+  // 閉じるボタン（固定・スクロールしない）
+  const footer=document.createElement('div');
+  footer.style.cssText='padding:8px 20px 18px;flex-shrink:0;';
+  const closeBtn=document.createElement('div');
+  closeBtn.style.cssText='text-align:center;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:8px;padding:8px;font-family:Cinzel,serif;font-size:12px;color:#c9a84c;cursor:pointer;touch-action:manipulation;';
+  closeBtn.textContent='閉じる';
+  const close=()=>{ if(popup.parentNode) popup.parentNode.removeChild(popup); };
+  closeBtn.onclick=close;
+  closeBtn.ontouchend=(e)=>{e.preventDefault();close();};
+  popup.onclick=(e)=>{if(e.target===popup)close();};
+  footer.appendChild(closeBtn);
+  box.appendChild(footer);
+
+  popup.appendChild(box);
+  document.body.appendChild(popup);
+}
+function renderMonsterEncyclopedia(content, progress){
+  const areas=[
+    {id:0, name:'始まりの洞窟', list:CAVE_ENEMIES},
+    {id:1, name:'忘却の遺跡', list:ENEMIES},
+    {id:2, name:'炎の神殿', list:TEMPLE_ENEMIES}
+  ];
+  let total=0, found=0, html='';
+  areas.forEach(area=>{
+    html+='<div style="font-family:\'Cinzel\',serif;font-size:11px;color:#c9a84c;margin-top:4px;">'+area.name+'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">';
+    area.list.forEach((e,idx)=>{
+      total++;
+      const rec=ZUKAN.defeated[area.id+'_'+idx];
+      if(rec){
+        found++;
+        const _imgHtml=rec.img
+          ?'<div style="width:36px;height:36px;margin:0 auto;position:relative;">'
+            +'<img src="'+rec.img+'" style="width:100%;height:100%;object-fit:contain;border-radius:4px;'+(rec.filter?'filter:'+rec.filter+';':'')+'" '
+            +'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\';">'
+            +'<div style="display:none;font-size:20px;">'+(rec.icon||'❓')+'</div>'
+          +'</div>'
+          :'<div style="font-size:20px;">'+(rec.icon||'❓')+'</div>';
+        html+='<div class="zukan-monster-card" data-area="'+area.id+'" data-idx="'+idx+'" style="cursor:pointer;touch-action:manipulation;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.35);border-radius:6px;padding:6px 4px;text-align:center;">'
+          +_imgHtml
+          +'<div style="font-size:'+_cardNameSize(rec.name)+'px;color:#eee;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(rec.boss?'👑':'')+rec.name+'</div>'
+          +'<div style="font-size:8px;color:#888;margin-top:2px;">HP'+rec.hp+' / ATK'+rec.atk+'</div>'
+          +'</div>';
+      } else {
+        html+='<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 4px;text-align:center;">'
+          +'<div style="font-size:20px;opacity:.3;">❓</div>'
+          +'<div style="font-size:9px;color:#555;margin-top:2px;">？？？</div>'
+          +'</div>';
+      }
+    });
+    html+='</div>';
+  });
+  content.innerHTML=html;
+  if(progress) progress.textContent='発見数: '+found+' / '+total;
+  // タップで詳細ポップアップ（行動パターンは現在のライブデータから取得）
+  const areaListMap={0:CAVE_ENEMIES,1:ENEMIES,2:TEMPLE_ENEMIES};
+  content.querySelectorAll('.zukan-monster-card').forEach(el=>{
+    const openDetail=(e)=>{
+      if(e.type==='touchend') e.preventDefault();
+      const aId=parseInt(el.dataset.area,10), idx=parseInt(el.dataset.idx,10);
+      const rec=ZUKAN.defeated[aId+'_'+idx];
+      const liveList=areaListMap[aId];
+      const pattern=(liveList && liveList[idx] && liveList[idx].pattern) || [];
+      if(rec) showMonsterDetailPopup(rec, pattern);
+    };
+    el.onclick=openDetail;
+    el.ontouchend=openDetail;
+  });
+}
+// 図鑑専用カード拡大表示（#appの外から呼ばれるためbodyに直接追加する）
+function showZukanCardDetail(c){
+  const popup=document.createElement('div');
+  popup.style.cssText='position:fixed;inset:0;z-index:9300;background:rgba(0,0,0,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;';
+  const fImg=FRAME_IMGS[c.rarity]||'';
+  const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️',D:'☠️'}[c.rarity]||'◆';
+  const cardDiv=document.createElement('div');
+  cardDiv.className='card '+c.rarity;
+  cardDiv.style.cssText='position:relative;width:180px;';
+  if(fImg){cardDiv.style.backgroundImage='url('+fImg+')';cardDiv.style.backgroundSize='100% 100%';}
+  const iconHtml='<div class="card-icon-wrap" style="width:48px;height:48px;margin:18px auto 4px;">'
+    +'<img src="card_'+(c._baseId||c.id)+'.png" style="width:100%;height:100%;object-fit:contain;border-radius:6px;" '
+    +'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\';" '
+    +'onload="this.nextSibling.style.display=\'none\';">'
+    +'<div class="card-icon" style="font-size:24px;line-height:1;">'+c.icon+'</div>'
+    +'</div>';
+  cardDiv.innerHTML=
+    '<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
+    '<div class="card-inner">'+
+      '<div class="card-type-label card-type-'+c.type+'" style="width:32px;height:32px;font-size:16px;top:6px;right:4px;">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+      '<div class="card-cost '+c.rarity+'" style="width:32px;height:32px;font-size:18px;top:6px;left:4px;">'+c.cost+'</div>'+
+      iconHtml+
+      '<div class="card-name" style="font-size:16.5px;margin-top:4px;">'+c.name+'</div>'+
+      '<div class="card-divider"></div>'+
+      '<div class="card-desc" style="font-size:12px;line-height:1.6;padding:0 14px;white-space:normal;word-break:break-all;">'+c.desc+'</div>'+
+      '<div style="margin:5px auto 3px;width:fit-content;background:#000;border:1.5px solid #fff;border-radius:5px;padding:2px 8px;"><span class="rarity-dot '+c.rarity+'" style="display:inline;font-size:8px;">'+(RL[c.rarity]||c.rarity)+'</span></div>'+
+    '</div>'+
+    '<div class="card-corner tl">'+corner+'</div>'+
+    '<div class="card-corner br">'+corner+'</div>';
+  popup.appendChild(cardDiv);
+  const closeBtn=document.createElement('div');
+  closeBtn.style.cssText='background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.5);border-radius:8px;padding:8px 28px;font-family:\'Cinzel\',serif;font-size:12px;color:#c9a84c;cursor:pointer;touch-action:manipulation;margin-top:4px;';
+  closeBtn.textContent='閉じる';
+  const close=()=>{ if(popup.parentNode) popup.parentNode.removeChild(popup); };
+  closeBtn.onclick=close;
+  closeBtn.ontouchend=(e)=>{e.preventDefault();close();};
+  popup.onclick=(e)=>{if(e.target===popup)close();};
+  popup.appendChild(closeBtn);
+  document.body.appendChild(popup);
+}
+function renderCardEncyclopedia(content, progress){
+  const ids=Object.keys(DB).filter(id=>DB[id] && DB[id].rarity && DB[id].rarity!=='gauge');
+  let total=0, found=0;
+  let html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">';
+  ids.forEach(id=>{
+    const c=DB[id];
+    total++;
+    const has=!!ZUKAN.cards[id];
+    if(has){
+      found++;
+      const rFrameImg=FRAME_IMGS[c.rarity]||'';
+      const _descText=c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':'');
+      html+='<div class="card '+c.rarity+' zukan-card-tap" data-cardid="'+id+'" style="position:relative;cursor:pointer;touch-action:manipulation;'+(rFrameImg?'background-image:url('+rFrameImg+');background-size:100% 100%;':'')+'">'
+        +'<div class="card-inner">'
+        +'<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'
+        +cardIconHtml(c)
+        +'<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'
+        +'<div class="card-divider"></div>'
+        +'<div class="card-desc" style="font-size:'+_cardDescSize(_descText)+'px;">'+_descText+'</div>'
+        +'</div></div>';
+    } else {
+      html+='<div class="card" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;">'
+        +'<div style="font-size:24px;opacity:.25;">❓</div></div>';
+    }
+  });
+  html+='</div>';
+  content.innerHTML=html;
+  if(progress) progress.textContent='獲得数: '+found+' / '+total;
+  content.querySelectorAll('.zukan-card-tap').forEach(el=>{
+    const openDetail=(e)=>{
+      if(e.type==='touchend') e.preventDefault();
+      const c=DB[el.dataset.cardid];
+      if(c) showZukanCardDetail(c);
+    };
+    el.onclick=openDetail;
+    el.ontouchend=openDetail;
+  });
+}
+
 // ============================================
 // チュートリアル
 // ============================================
@@ -8314,17 +8940,20 @@ function showStageIntro(stageNum, enemyData, onStart){
   ].join(';');
 
   const stageLabel=stageNum<=9?'0'+stageNum:''+stageNum;
-  const isLast=(stageNum===15);
-  const accentColor=isLast?'#e74c3c':'#c9a84c';
+  const isBoss=!!enemyData.boss;
+  const accentColor=isBoss?'#e74c3c':'#c9a84c';
 
   div.innerHTML=
+    (isBoss?'<div class="stage-intro-boss-vignette"></div><div style="font-size:12px;letter-spacing:.3em;color:#ff5555;opacity:.9;margin-bottom:6px;animation:boss-warn-blink 1s infinite;">⚠ BOSS BATTLE ⚠</div>':'')+
     '<div style="font-size:11px;letter-spacing:.4em;color:'+accentColor+';opacity:.7;margin-bottom:8px;">── DUNGEON WALKER ──</div>'+
-    '<div style="font-size:52px;font-weight:bold;letter-spacing:.2em;color:'+accentColor+';text-shadow:0 0 30px '+accentColor+'88;">'+
+    '<div class="'+(isBoss?'stage-intro-boss-label':'')+'" style="font-size:52px;font-weight:bold;letter-spacing:.2em;color:'+accentColor+';text-shadow:0 0 30px '+accentColor+'88;">'+
       'STAGE<br>'+stageLabel+
     '</div>'+
     '<div style="width:120px;height:1px;background:'+accentColor+';margin:18px 0;opacity:.5;"></div>'+
     '<div style="font-size:16px;color:#ddd;letter-spacing:.1em;">'+enemyData.name+'</div>'+
     '<div style="margin-top:48px;font-size:11px;color:#666;letter-spacing:.2em;animation:blink 1.2s infinite;">TAP TO START</div>';
+
+  if(isBoss) div.classList.add('boss-entrance');
 
   // blink アニメが未定義なら追加
   if(!document.getElementById('stage-intro-style')){
@@ -8531,6 +9160,7 @@ document.addEventListener('visibilitychange', ()=>{
 
 </script>
 
+
 <div class="overlay" id="ov-rules" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;">
   <div class="ov-title" style="font-size:16px;margin-top:0;">📜 ルール説明</div>
   <div style="width:100%;overflow-y:auto;max-height:64vh;display:flex;flex-direction:column;gap:8px;font-family:sans-serif;">
@@ -8599,10 +9229,20 @@ document.addEventListener('visibilitychange', ()=>{
     'img_player_label.png','img_enemy_label.png',
     'bg_hand.png',
   ];
-  imgs.forEach(src=>{
-    const img=new Image();
-    img.src=src;
-  });
+  // 起動直後に60枚超を一斉リクエストすると、その間タップ操作の反応が鈍ることがあるため、
+  // ブラウザの空き時間（requestIdleCallback）を使って少しずつ・非同期デコードで読み込む。
+  const _ric=window.requestIdleCallback||function(cb){return setTimeout(()=>cb({timeRemaining:()=>10}),50);};
+  let _i=0;
+  function _preloadStep(deadline){
+    while(_i<imgs.length && (!deadline||deadline.timeRemaining()>0)){
+      const img=new Image();
+      img.decoding='async';
+      img.src=imgs[_i];
+      _i++;
+    }
+    if(_i<imgs.length) _ric(_preloadStep);
+  }
+  _ric(_preloadStep);
 })();
 </script>
 
